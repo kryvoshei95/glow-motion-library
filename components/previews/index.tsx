@@ -653,9 +653,11 @@ function BaseCheckbox({ reduced, card }: PreviewProps) {
             backgroundColor: checked ? "var(--accent)" : "var(--surface)",
             borderColor: checked ? "var(--accent)" : "var(--border)",
           }}
-          transition={t(0.18, reduced)}
+          transition={{ duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="grid h-6 w-6 place-items-center border"
         >
+          {/* Pure path-line draw (motion.dev base-checkbox): only pathLength
+              animates — no opacity fade — so the tick is "drawn", not faded. */}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <motion.path
               d="M5 12.5 10 17.5 19 7"
@@ -664,8 +666,12 @@ function BaseCheckbox({ reduced, card }: PreviewProps) {
               strokeLinecap="round"
               strokeLinejoin="round"
               initial={false}
-              animate={{ pathLength: checked ? 1 : 0, opacity: checked ? 1 : 0 }}
-              transition={t(0.25, reduced)}
+              animate={{ pathLength: checked ? 1 : 0 }}
+              transition={
+                reduced
+                  ? { duration: 0 }
+                  : { type: "spring", stiffness: 380, damping: 26, delay: checked ? 0.06 : 0 }
+              }
             />
           </svg>
         </motion.span>

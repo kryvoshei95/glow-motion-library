@@ -1,149 +1,8 @@
 [
   {
-    "slug": "base-checkbox",
-    "name": "Checkbox",
-    "category": "inputs",
-    "interactive": true,
-    "useCase": "Чекбокс: галочка домальовується (path-draw) при відмітці — чіткий перехід стану.",
-    "trigger": "click/tap",
-    "duration": { "value": 200, "token": "base", "unit": "ms" },
-    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
-    "motionProperties": [
-      { "property": "pathLength", "from": 0, "to": 1 },
-      { "property": "background-color", "from": "surface", "to": "accent" }
-    ],
-    "complexity": "medium",
-    "platform": "both",
-    "loop": false,
-    "accessibility": {
-      "reducedMotion": "reduce",
-      "note": "Зменшити рух — показувати готову галочку без draw; стан передавати role=checkbox + aria-checked, не лише кольором."
-    },
-    "devHandoff": {
-      "note": "motion.dev base-checkbox: галочка через pathLength (Framer) або stroke-dashoffset (CSS); фон box'а — окремий transition.",
-      "css": ".check path{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);transition:stroke-dashoffset var(--motion-duration-base) var(--motion-ease-smooth)}\ninput:checked+.box .check path{stroke-dashoffset:0}\n.box{transition:background-color var(--motion-duration-base) var(--motion-ease-smooth)}",
-      "tailwind": "transition-[background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
-      "framerMotion": { "path": { "animate": { "pathLength": 1 }, "transition": { "duration": 0.25, "ease": [0.22, 1, 0.36, 1] } } },
-      "gsap": "gsap.fromTo(path,{drawSVG:'0%'},{drawSVG:'100%',duration:0.25,ease:'power2.out'})",
-      "lottie": null
-    },
-    "guidelines": {
-      "do": ["Передавати стан через aria-checked, не лише візуально."],
-      "dont": ["Не робити draw довшим за ~250ms — відмітка має відчуватися миттєвою."]
-    },
-    "tags": ["checkbox", "input", "form", "path-draw"],
-    "preview": { "component": "BaseCheckbox" }
-  },
-  {
-    "slug": "copy-button",
-    "name": "Copy Button",
-    "category": "buttons",
-    "interactive": true,
-    "useCase": "Кнопка копіювання: іконка copy змінюється на галочку з blur-переходом і draw — підтвердження дії.",
-    "trigger": "click/tap",
-    "duration": { "value": 200, "token": "base", "unit": "ms" },
-    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
-    "motionProperties": [
-      { "property": "opacity", "from": 0, "to": 1 },
-      { "property": "filter", "from": "blur(3px)", "to": "blur(0px)" },
-      { "property": "pathLength", "from": 0, "to": 1 }
-    ],
-    "complexity": "medium",
-    "platform": "both",
-    "loop": false,
-    "accessibility": {
-      "reducedMotion": "reduce",
-      "note": "Зменшити рух — прибрати blur і draw, лишити миттєву зміну іконки; повертати у вихідний стан через ~1.5с."
-    },
-    "devHandoff": {
-      "note": "motion.dev copy-button: AnimatePresence mode='wait', крос-фейд copy↔check з blur, галочка через pathLength.",
-      "css": ".copy-ico,.check-ico{transition:opacity 200ms var(--motion-ease-smooth),filter 200ms var(--motion-ease-smooth)}\n.copy-ico[data-hidden],.check-ico[data-hidden]{opacity:0;filter:blur(3px)}",
-      "tailwind": "transition-[opacity,filter] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-[hidden]:blur-[3px] data-[hidden]:opacity-0",
-      "framerMotion": { "mode": "wait", "initial": { "opacity": 0, "scale": 0.6, "filter": "blur(3px)" }, "animate": { "opacity": 1, "scale": 1, "filter": "blur(0px)" }, "exit": { "opacity": 0, "scale": 0.6, "filter": "blur(3px)" }, "transition": { "duration": 0.2 } },
-      "gsap": "gsap.to(copy,{autoAlpha:0,filter:'blur(3px)',duration:0.2});gsap.fromTo(check,{autoAlpha:0,filter:'blur(3px)'},{autoAlpha:1,filter:'blur(0px)',duration:0.2})",
-      "lottie": null
-    },
-    "guidelines": {
-      "do": ["Повертати кнопку у стан «Копіювати» через 1.5–2с."],
-      "dont": ["Не змінювати ширину кнопки при зміні підпису — зарезервувати місце."]
-    },
-    "tags": ["copy", "button", "icon-swap", "feedback"],
-    "preview": { "component": "CopyButtonAnim" }
-  },
-  {
-    "slug": "base-switch",
-    "name": "Switch",
-    "category": "inputs",
-    "interactive": true,
-    "useCase": "Перемикач: повзунок пружинно переїжджає, трек змінює колір — увімк/вимк налаштування.",
-    "trigger": "click/tap",
-    "duration": { "value": 200, "token": "base", "unit": "ms" },
-    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
-    "motionProperties": [
-      { "property": "translateX (layout)", "from": "left", "to": "right" },
-      { "property": "background-color", "from": "surface-2", "to": "accent" }
-    ],
-    "complexity": "medium",
-    "platform": "both",
-    "loop": false,
-    "accessibility": {
-      "reducedMotion": "reduce",
-      "note": "Зменшити рух — повзунок перемикається без пружини; стан через role=switch + aria-checked."
-    },
-    "devHandoff": {
-      "note": "motion.dev base-switch: thumb рухається layout-анімацією (justify-content flip), spring; колір треку — окремий transition.",
-      "css": ".switch{display:flex;align-items:center;justify-content:flex-start;transition:background-color 200ms var(--motion-ease-smooth)}\n.switch[data-on]{justify-content:flex-end;background:var(--accent)}\n.thumb{transition:transform 200ms var(--motion-ease-smooth)}",
-      "tailwind": "flex items-center justify-start data-[on]:justify-end transition-colors duration-200",
-      "framerMotion": { "thumb": { "layout": true, "transition": { "type": "spring", "stiffness": 500, "damping": 32 } }, "track": { "animate": { "backgroundColor": "var(--accent)" }, "transition": { "duration": 0.2 } } },
-      "gsap": "gsap.to(thumb,{x:on?20:0,duration:0.25,ease:'back.out(1.4)'})",
-      "lottie": null
-    },
-    "guidelines": {
-      "do": ["Використовувати spring для природного переїзду повзунка."],
-      "dont": ["Не покладатись лише на колір треку — форма/позиція повзунка теж має читатись."]
-    },
-    "tags": ["switch", "toggle", "input", "spring"],
-    "preview": { "component": "BaseSwitch" }
-  },
-  {
-    "slug": "base-radio",
-    "name": "Radio",
-    "category": "inputs",
-    "interactive": true,
-    "useCase": "Радіо-група: точка обраного варіанта з'являється пружинним масштабуванням.",
-    "trigger": "click/tap",
-    "duration": { "value": 200, "token": "base", "unit": "ms" },
-    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
-    "motionProperties": [
-      { "property": "scale", "from": 0, "to": 1 },
-      { "property": "opacity", "from": 0, "to": 1 }
-    ],
-    "complexity": "easy",
-    "platform": "both",
-    "loop": false,
-    "accessibility": {
-      "reducedMotion": "reduce",
-      "note": "Зменшити рух — точка з'являється без пружини; група через role=radiogroup + aria-checked, навігація стрілками."
-    },
-    "devHandoff": {
-      "note": "motion.dev base-radio: внутрішня точка з scale 0→1 (spring); AnimatePresence для зняття вибору.",
-      "css": ".radio .dot{transform:scale(0);opacity:0;transition:transform 200ms var(--motion-ease-smooth),opacity 200ms var(--motion-ease-smooth)}\n.radio[data-checked] .dot{transform:scale(1);opacity:1}",
-      "tailwind": "scale-0 opacity-0 transition-[transform,opacity] duration-200 data-[checked]:scale-100 data-[checked]:opacity-100",
-      "framerMotion": { "initial": { "scale": 0, "opacity": 0 }, "animate": { "scale": 1, "opacity": 1 }, "exit": { "scale": 0, "opacity": 0 }, "transition": { "type": "spring", "stiffness": 500, "damping": 28 } },
-      "gsap": "gsap.fromTo(dot,{scale:0,autoAlpha:0},{scale:1,autoAlpha:1,duration:0.25,ease:'back.out(2)'})",
-      "lottie": null
-    },
-    "guidelines": {
-      "do": ["Підтримувати навігацію стрілками всередині групи."],
-      "dont": ["Не дозволяти зняти вибір повністю (на відміну від чекбокса)."]
-    },
-    "tags": ["radio", "input", "form", "spring"],
-    "preview": { "component": "BaseRadio" }
-  },
-  {
     "slug": "toast-stack",
     "name": "Toast Stack",
-    "category": "notifications",
+    "category": "alert",
     "interactive": true,
     "useCase": "Стопка сповіщень: нові тости складаються вглиб (scale + зсув), при наведенні розкриваються списком.",
     "trigger": "on event",
@@ -179,7 +38,7 @@
   {
     "slug": "error-state-shake",
     "name": "Error State Shake",
-    "category": "inputs",
+    "category": "alert",
     "interactive": true,
     "useCase": "Валідація форми: інпут трясеться вліво-вправо з овершутом, рамка червоніє, знизу з'являється повідомлення.",
     "trigger": "on event",
@@ -212,74 +71,145 @@
     "preview": { "component": "ErrorShake" }
   },
   {
-    "slug": "avatar-group-hover",
-    "name": "Avatar Group Hover",
-    "category": "hover",
+    "slug": "copy-button",
+    "name": "Copy Button",
+    "category": "buttons",
     "interactive": true,
-    "useCase": "Наведення на елемент горизонтального ряду піднімає його й сусідів зі спадом сили, а повернення — з пружним овершутом.",
-    "trigger": "hover",
-    "duration": { "value": 300, "token": "moderate", "unit": "ms" },
+    "useCase": "Кнопка копіювання: іконка copy змінюється на галочку з blur-переходом і draw — підтвердження дії.",
+    "trigger": "click/tap",
+    "duration": { "value": 200, "token": "base", "unit": "ms" },
     "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
     "motionProperties": [
-      { "property": "translateY", "from": "0px", "to": "-4px × falloff^distance" },
-      { "property": "scale", "from": 1, "to": 1.05 }
+      { "property": "opacity", "from": 0, "to": 1 },
+      { "property": "filter", "from": "blur(4px)", "to": "blur(0px)" },
+      { "property": "pathLength", "from": 0, "to": 1 }
     ],
-    "complexity": "advanced",
-    "platform": "web",
-    "loop": false,
-    "accessibility": {
-      "reducedMotion": "keep",
-      "note": "Безпечно лишати — декоративний hover; на touch не спрацьовує, тож не нести через нього сенсу."
-    },
-    "devHandoff": {
-      "note": "transitions.dev avatar-group-hover: lift × falloff^distance, напрямок-залежний easing — чистий ease-in на підйом, пружний ease-out на повернення. transition-timing-function ставиться інлайн ПЕРЕД записом --shift/--scale.",
-      "css": ".t-avatar{transform:translateY(var(--shift,0)) scale(var(--scale-active,1));transition:transform 320ms var(--avatar-ease-in);will-change:transform}\n/* JS: на mouseenter — el.style.setProperty('--shift', (lift*falloff**dist)+'px'); ease-in. на mouseleave root — reset, ease-out cubic-bezier(0.34,3.85,0.64,1) */",
-      "tailwind": "transition-transform duration-300 will-change-transform; значення --shift/--scale-active та timing-function писати інлайн з JS.",
-      "framerMotion": { "note": "Краще через CSS-vars + inline timing-function (напрямок-залежний easing); Framer варіант — animate кожного елемента з custom за distance." },
-      "gsap": "items.forEach((el,i)=>el.addEventListener('mouseenter',()=>gsap.to(items,{y:i=>lift*falloff**Math.abs(i-idx),duration:0.32})))",
-      "lottie": null
-    },
-    "guidelines": {
-      "do": ["Дублювати ефект на focus-visible для клавіатури.", "Тримати підйом тонким (≈4px)."],
-      "dont": ["Не покладатись лише на hover — touch його не має."]
-    },
-    "tags": ["avatar", "hover", "group", "spring"],
-    "preview": { "component": "AvatarGroupHover" }
-  },
-  {
-    "slug": "dropdown-menu-morph",
-    "name": "Dropdown Menu Morph",
-    "category": "menus",
-    "interactive": true,
-    "useCase": "Кругла кнопка-тригер «+» морфиться у саму панель меню: бокс росте, радіус розслабляється, плюс кросфейдиться з обертанням, контент в'їжджає.",
-    "trigger": "click/tap",
-    "duration": { "value": 300, "token": "moderate", "unit": "ms" },
-    "easing": { "token": "ease-smooth", "cubicBezier": [0.34, 1.25, 0.64, 1] },
-    "motionProperties": [
-      { "property": "width/height", "from": "44px", "to": "панель" },
-      { "property": "border-radius", "from": "40px", "to": "12px" },
-      { "property": "opacity/blur (плюс↔меню)", "from": "0 / blur(2px)", "to": "1 / blur(0)" }
-    ],
-    "complexity": "advanced",
+    "complexity": "medium",
     "platform": "both",
     "loop": false,
     "accessibility": {
       "reducedMotion": "reduce",
-      "note": "Зменшити рух — без морфу розміру/блюру, миттєвий показ панелі; тримати aria-expanded, фокус і закриття по Esc/кліку поза."
+      "note": "Зменшити рух — прибрати blur і draw, лишити миттєву зміну іконки; повертати у вихідний стан через ~1.5с."
     },
     "devHandoff": {
-      "note": "transitions.dev plus-to-menu morph: один елемент і тригер, і панель. Розкриття бунчастим ease (0.34,1.25,0.64,1), закриття — спокійним (0.22,1,0.36,1). overflow:hidden клипає контент під час морфу.",
-      "css": ".t-morph{position:relative;width:44px;height:44px;border-radius:40px;overflow:hidden;transition:width 250ms var(--morph-close-ease),height 250ms var(--morph-close-ease),border-radius 250ms var(--morph-close-ease)}\n.t-morph[data-open=true]{width:208px;height:150px;border-radius:12px;transition:width 350ms var(--morph-ease),height 350ms var(--morph-ease),border-radius 350ms var(--morph-ease)}\n.t-morph-menu{position:absolute;inset:0;opacity:0;transform:translateX(40px) scale(0.97);filter:blur(2px);transition:opacity 200ms,transform 350ms,filter 200ms}\n.t-morph[data-open=true] .t-morph-menu{opacity:1;transform:none;filter:blur(0)}",
-      "tailwind": "Розміри/радіус через data-[open] варіанти + кастомні ease у config; плюс і меню — окремі шари з opacity/blur/translate.",
-      "framerMotion": { "container": { "animate": { "width": "open?208:44", "height": "open?150:44", "borderRadius": "open?12:40" }, "transition": { "duration": 0.35, "ease": [0.34, 1.25, 0.64, 1] } } },
-      "gsap": "gsap.to(morph,{width:208,height:150,borderRadius:12,duration:0.35,ease:'back.out(1.4)'})",
+      "note": "motion.dev copy-button: AnimatePresence mode='wait', крос-фейд copy↔check з blur, галочка через pathLength.",
+      "css": ".copy-ico,.check-ico{transition:opacity 200ms var(--motion-ease-smooth),filter 200ms var(--motion-ease-smooth)}\n.copy-ico[data-hidden],.check-ico[data-hidden]{opacity:0;filter:blur(4px)}",
+      "tailwind": "transition-[opacity,filter] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-[hidden]:blur-[4px] data-[hidden]:opacity-0",
+      "framerMotion": { "mode": "wait", "initial": { "opacity": 0, "scale": 0.5, "filter": "blur(4px)" }, "animate": { "opacity": 1, "scale": 1, "filter": "blur(0px)" }, "exit": { "opacity": 0, "scale": 0.5, "filter": "blur(4px)" }, "transition": { "duration": 0.18 } },
+      "gsap": "gsap.to(copy,{autoAlpha:0,filter:'blur(4px)',duration:0.18});gsap.fromTo(check,{autoAlpha:0,filter:'blur(4px)'},{autoAlpha:1,filter:'blur(0px)',duration:0.18})",
       "lottie": null
     },
     "guidelines": {
-      "do": ["Закривати по кліку поза та Esc, дзеркалити стан в aria-expanded.", "Різні ease на розкриття (бунчастий) і закриття (спокійний)."],
-      "dont": ["Не використовувати, якщо тригер і панель — різні елементи (тоді звичайний dropdown)."]
+      "do": ["Повертати кнопку у стан «Копіювати» через 1.5–2с."],
+      "dont": ["Не змінювати ширину кнопки при зміні підпису — зарезервувати місце."]
     },
-    "tags": ["dropdown", "menu", "morph", "fab"],
-    "preview": { "component": "PlusMenuMorph" }
+    "tags": ["copy", "button", "icon-swap", "feedback"],
+    "preview": { "component": "CopyButtonAnim" }
+  },
+  {
+    "slug": "base-checkbox",
+    "name": "Checkbox",
+    "category": "checkbox",
+    "interactive": true,
+    "useCase": "Чекбокс: галочка домальовується (path-draw) з легким баунсом боксу; при знятті — прочерчується назад.",
+    "trigger": "click/tap",
+    "duration": { "value": 300, "token": "moderate", "unit": "ms" },
+    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
+    "motionProperties": [
+      { "property": "pathLength", "from": 0, "to": 1 },
+      { "property": "scale (бокс)", "from": 1, "to": "1.08 → 1" },
+      { "property": "background-color", "from": "surface", "to": "accent" }
+    ],
+    "complexity": "medium",
+    "platform": "both",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — показувати готову галочку без draw і баунсу; стан передавати role=checkbox + aria-checked, не лише кольором."
+    },
+    "devHandoff": {
+      "note": "motion.dev base-checkbox: галочка через pathLength (тільки draw, без opacity-фейду); легкий scale-поп боксу; при знятті фон тримається, доки лінія прочерчується назад.",
+      "css": ".check path{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);transition:stroke-dashoffset var(--motion-duration-moderate) var(--motion-ease-smooth)}\ninput:checked+.box .check path{stroke-dashoffset:0}\n.box{transition:background-color var(--motion-duration-base) var(--motion-ease-smooth)}",
+      "tailwind": "transition-[background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+      "framerMotion": { "path": { "animate": { "pathLength": 1 }, "transition": { "type": "spring", "stiffness": 380, "damping": 26 } }, "box": { "animate": { "scale": [1, 1.08, 0.99, 1] }, "transition": { "duration": 0.34, "ease": "easeOut" } } },
+      "gsap": "gsap.fromTo(path,{drawSVG:'0%'},{drawSVG:'100%',duration:0.3,ease:'power2.out'})",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Передавати стан через aria-checked, не лише візуально.", "Тримати баунс легким (scale ≤ 1.1)."],
+      "dont": ["Не робити draw довшим за ~300ms — відмітка має відчуватися швидкою."]
+    },
+    "tags": ["checkbox", "input", "form", "path-draw"],
+    "preview": { "component": "BaseCheckbox" }
+  },
+  {
+    "slug": "base-radio",
+    "name": "Radio",
+    "category": "radio",
+    "interactive": true,
+    "useCase": "Радіо-група: точка обраного варіанта з'являється/зникає пружинним масштабуванням із легким баунсом.",
+    "trigger": "click/tap",
+    "duration": { "value": 200, "token": "base", "unit": "ms" },
+    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
+    "motionProperties": [
+      { "property": "scale", "from": 0, "to": 1 },
+      { "property": "opacity", "from": 0, "to": 1 }
+    ],
+    "complexity": "easy",
+    "platform": "both",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — точка з'являється без пружини; група через role=radiogroup + aria-checked, навігація стрілками."
+    },
+    "devHandoff": {
+      "note": "motion.dev base-radio: внутрішня точка з scale 0→1 на пружині з легким баунсом; AnimatePresence для зняття вибору (теж із баунсом).",
+      "css": ".radio .dot{transform:scale(0);opacity:0;transition:transform 200ms var(--motion-ease-smooth),opacity 200ms var(--motion-ease-smooth)}\n.radio[data-checked] .dot{transform:scale(1);opacity:1}",
+      "tailwind": "scale-0 opacity-0 transition-[transform,opacity] duration-200 data-[checked]:scale-100 data-[checked]:opacity-100",
+      "framerMotion": { "initial": { "scale": 0, "opacity": 0 }, "animate": { "scale": 1, "opacity": 1 }, "exit": { "scale": 0, "opacity": 0 }, "transition": { "type": "spring", "visualDuration": 0.28, "bounce": 0.5 } },
+      "gsap": "gsap.fromTo(dot,{scale:0,autoAlpha:0},{scale:1,autoAlpha:1,duration:0.28,ease:'back.out(2.5)'})",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Підтримувати навігацію стрілками всередині групи."],
+      "dont": ["Не дозволяти зняти вибір повністю (на відміну від чекбокса)."]
+    },
+    "tags": ["radio", "input", "form", "spring"],
+    "preview": { "component": "BaseRadio" }
+  },
+  {
+    "slug": "base-switch",
+    "name": "Switch",
+    "category": "toggle",
+    "interactive": true,
+    "useCase": "Перемикач: повзунок пружинно переїжджає з легким баунсом, трек змінює колір — увімк/вимк налаштування.",
+    "trigger": "click/tap",
+    "duration": { "value": 200, "token": "base", "unit": "ms" },
+    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
+    "motionProperties": [
+      { "property": "translateX (layout)", "from": "left", "to": "right" },
+      { "property": "background-color", "from": "surface-2", "to": "accent" }
+    ],
+    "complexity": "medium",
+    "platform": "both",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — повзунок перемикається без пружини; стан через role=switch + aria-checked."
+    },
+    "devHandoff": {
+      "note": "motion.dev base-switch: thumb рухається layout-анімацією (justify-content flip), spring із легким баунсом; колір треку — окремий transition.",
+      "css": ".switch{display:flex;align-items:center;justify-content:flex-start;transition:background-color 200ms var(--motion-ease-smooth)}\n.switch[data-on]{justify-content:flex-end;background:var(--accent)}\n.thumb{transition:transform 200ms var(--motion-ease-smooth)}",
+      "tailwind": "flex items-center justify-start data-[on]:justify-end transition-colors duration-200",
+      "framerMotion": { "thumb": { "layout": true, "transition": { "type": "spring", "visualDuration": 0.32, "bounce": 0.32 } }, "track": { "animate": { "backgroundColor": "var(--accent)" }, "transition": { "duration": 0.2 } } },
+      "gsap": "gsap.to(thumb,{x:on?20:0,duration:0.3,ease:'back.out(1.5)'})",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Використовувати spring із легким баунсом для природного переїзду повзунка."],
+      "dont": ["Не покладатись лише на колір треку — форма/позиція повзунка теж має читатись."]
+    },
+    "tags": ["switch", "toggle", "input", "spring"],
+    "preview": { "component": "BaseSwitch" }
   }
 ]

@@ -1,19 +1,15 @@
 // Meaningful animation categories (UA labels below).
 export type Category =
-  | "transitions"
+  | "alert"
   | "buttons"
-  | "inputs"
-  | "modals"
-  | "notifications"
-  | "loading"
-  | "menus"
-  | "lists"
-  | "reveal"
+  | "checkbox"
+  | "dropdown"
+  | "modal"
+  | "progress"
+  | "radio"
   | "scroll"
-  | "hover"
-  | "icons"
-  | "text"
-  | "tooltips";
+  | "tab"
+  | "toggle";
 
 export type Trigger =
   | "in-view"
@@ -66,36 +62,29 @@ export interface Animation {
 }
 
 // Display order + UA labels for the sidebar.
+// Alphabetical by label — new entries must be inserted in alphabetical order.
 export const CATEGORY_ORDER: Category[] = [
-  "transitions",
+  "alert",
   "buttons",
-  "inputs",
-  "modals",
-  "notifications",
-  "loading",
-  "menus",
-  "lists",
-  "reveal",
+  "checkbox",
+  "dropdown",
+  "modal",
+  "progress",
+  "radio",
   "scroll",
-  "hover",
-  "icons",
-  "text",
-  "tooltips",
+  "tab",
+  "toggle",
 ];
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  transitions: "Переходи",
-  buttons: "Кнопки",
-  inputs: "Інпути",
-  modals: "Модалки",
-  notifications: "Сповіщення",
-  loading: "Завантаження",
-  menus: "Меню",
-  lists: "Списки",
-  reveal: "Поява",
-  scroll: "Скрол",
-  hover: "Наведення",
-  icons: "Іконки",
-  text: "Текст",
-  tooltips: "Підказки",
+  alert: "Alert, Notification & Toast",
+  buttons: "Buttons",
+  checkbox: "Checkbox",
+  dropdown: "Dropdown",
+  modal: "Modal",
+  progress: "Progress Bar",
+  radio: "Radio",
+  scroll: "Scroll",
+  tab: "Tab",
+  toggle: "Toggle",
 };

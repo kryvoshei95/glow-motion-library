@@ -1,0 +1,218 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ---- Motion tokens (duration scale) ---- */
+  --motion-duration-instant: 100ms;
+  --motion-duration-fast: 150ms;
+  --motion-duration-base: 200ms;
+  --motion-duration-moderate: 300ms;
+  --motion-duration-slow: 500ms;
+  --motion-duration-slowest: 800ms;
+
+  /* ---- Motion tokens (easing set) ---- */
+  --motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --motion-ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  /* transitions.dev signature smooth ease-out (modals, dropdowns, tabs, routes) */
+  --motion-ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ---- Theme: light (motion.dev/examples palette) ---- */
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --surface-2: #eef0f4;
+  --border: #d4d9e2;
+  --fg: #18222e;
+  --muted: #5b6573;
+  /* Monochrome accent — no blue/orange; "black" in light theme */
+  --accent: #18222e;
+  --accent-fg: #ffffff;
+  --brand: #18222e;
+  --brand-fg: #ffffff;
+}
+
+.dark {
+  --bg: #0c0d11;
+  --surface: #12141a;
+  --surface-2: #191c24;
+  --border: #1f222b;
+  --fg: #ededec;
+  --muted: #9aa1ae;
+  /* Monochrome accent — "black" inverts to near-white on dark bg */
+  --accent: #ededec;
+  --accent-fg: #0c0d11;
+  --brand: #ededec;
+  --brand-fg: #0c0d11;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  /* motion.dev stack: TASA Orbiter, Inter (Cyrillic fallback), then system */
+  font-family: var(--font-tasa), var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+code,
+pre,
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  letter-spacing: 0;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
+}
+
+/* Example card — matches motion.dev/examples interaction */
+.ex-card {
+  transition: border-color 0.12s ease, transform 0.12s ease;
+}
+.ex-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+.ex-thumb {
+  transition: transform 0.12s ease;
+  will-change: transform;
+}
+.ex-card:hover .ex-thumb {
+  transform: scale(1.03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ex-card:hover .ex-thumb {
+    transform: none;
+  }
+}
+
+/* ---- motion.dev/ engineering aesthetic ---- */
+
+/* Monospace caps label (// OPEN SOURCE, nav, tags) */
+.caps {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 1.1px;
+  line-height: 1;
+}
+
+/* Caps-stripe button (motion.dev "GET STARTED") */
+.btn-caps {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 1.1px;
+  padding: 11px 18px;
+  border: 1px solid var(--border);
+  color: var(--fg);
+  background-color: var(--surface);
+  background-image: repeating-linear-gradient(
+    119deg,
+    color-mix(in srgb, var(--fg) 12%, transparent) 0,
+    color-mix(in srgb, var(--fg) 12%, transparent) 1px,
+    transparent 1px,
+    transparent 6px
+  );
+  transition: border-color 0.12s ease, color 0.12s ease, background-color 0.12s ease;
+}
+.btn-caps:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: var(--fg);
+}
+.btn-caps-primary {
+  color: var(--brand-fg);
+  border-color: var(--brand);
+  background-color: var(--brand);
+  background-image: repeating-linear-gradient(
+    119deg,
+    rgba(14, 19, 18, 0.28) 0,
+    rgba(14, 19, 18, 0.28) 1px,
+    transparent 1px,
+    transparent 6px
+  );
+}
+.btn-caps-primary:hover {
+  border-color: var(--brand);
+  filter: brightness(1.04);
+}
+
+/* Engineering ruler-tick rule */
+.ruler {
+  height: 7px;
+  border-bottom: 1px solid var(--border);
+  background-image: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 1px, transparent 1px, transparent 8px);
+  background-repeat: repeat-x;
+  background-position: bottom left;
+  background-size: 8px 5px;
+}
+
+/* Diagonal hatch band */
+.hatch {
+  background-image: repeating-linear-gradient(119deg, var(--border) 0, var(--border) 1px, transparent 1px, transparent 7px);
+}
+
+/* Card click-routing: empty areas fall through to the card's modal overlay,
+   only real interactive controls stay clickable (in-card demo). */
+.demo-interactive button,
+.demo-interactive input,
+.demo-interactive select,
+.demo-interactive a,
+.demo-interactive [role="button"],
+.demo-interactive label {
+  pointer-events: auto;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Unified, accessible focus ring (dev-tool look) */
+:where(a, button, input, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Native buttons default to the arrow cursor — make clickable ones obvious */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+/* Shimmer keyframe used by the skeleton preview */
+@keyframes ml-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Global respect for reduced motion (real-world default).
+   Previews can override locally to demonstrate behaviour. */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.allow-motion):not(.allow-motion *) {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

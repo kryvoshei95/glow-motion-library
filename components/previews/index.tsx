@@ -652,8 +652,14 @@ function BaseCheckbox({ reduced, card }: PreviewProps) {
           animate={{
             backgroundColor: checked ? "var(--accent)" : "var(--surface)",
             borderColor: checked ? "var(--accent)" : "var(--border)",
+            // Light bounce: the box pops with a slight overshoot on check.
+            scale: !reduced && checked ? [1, 1.18, 0.97, 1] : 1,
           }}
-          transition={{ duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
+          transition={{
+            backgroundColor: { duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] },
+            borderColor: { duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] },
+            scale: { duration: reduced ? 0 : 0.42, times: [0, 0.35, 0.7, 1], ease: "easeOut" },
+          }}
           className="grid h-6 w-6 place-items-center border"
         >
           {/* Pure path-line draw (motion.dev base-checkbox): only pathLength

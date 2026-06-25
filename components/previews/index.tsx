@@ -6,6 +6,7 @@ import {
   useScroll,
   useTransform,
   useMotionValue,
+  useAnimationControls,
   animate,
   useInView,
 } from "framer-motion";
@@ -637,8 +638,26 @@ function InputLabelFloat({ reduced, card }: PreviewProps) {
 /* 21. Base Checkbox — path-draw tick (motion.dev/examples/react-base-checkbox) */
 function BaseCheckbox({ reduced, card }: PreviewProps) {
   const [checkedState, setChecked] = useState(false);
+  const pop = useAnimationControls();
+  const first = useRef(true);
   const auto = useAutoOpen(card, 450);
   const checked = card ? auto : checkedState;
+  const DRAW = 0.3; // tick draw / retract duration
+
+  // Light bounce on every toggle (check AND uncheck), fired imperatively so it
+  // replays each time; skipped on first paint and when reduced-motion is on.
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    if (reduced) return;
+    pop.start(
+      { scale: [1, 1.08, 0.99, 1] },
+      { duration: 0.34, times: [0, 0.4, 0.75, 1], ease: "easeOut" },
+    );
+  }, [checked, reduced, pop]);
+
   return (
     <Stage>
       <button
@@ -647,41 +666,40 @@ function BaseCheckbox({ reduced, card }: PreviewProps) {
         aria-label="Чекбокс"
         onClick={() => setChecked((v) => !v)}
       >
-        <motion.span
-          aria-hidden
-          animate={{
-            backgroundColor: checked ? "var(--accent)" : "var(--surface)",
-            borderColor: checked ? "var(--accent)" : "var(--border)",
-            // Light bounce: the box pops with a slight overshoot on check.
-            scale: !reduced && checked ? [1, 1.18, 0.97, 1] : 1,
-          }}
-          transition={{
-            // On uncheck, hold the fill so the tick retracts on the filled box
-            // first (visible reverse-draw), then the box un-fills.
-            backgroundColor: { duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1], delay: reduced || checked ? 0 : 0.18 },
-            borderColor: { duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1], delay: reduced || checked ? 0 : 0.18 },
-            scale: { duration: reduced ? 0 : 0.42, times: [0, 0.35, 0.7, 1], ease: "easeOut" },
-          }}
-          className="grid h-8 w-8 place-items-center rounded-[7px] border"
-        >
-          {/* Pure path-line draw (motion.dev base-checkbox): only pathLength
-              animates — drawn forward on check, retracted (reverse) on uncheck. */}
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <motion.path
-              d="M5 12.5 10 17.5 19 7"
-              stroke="var(--accent-fg)"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              initial={false}
-              animate={{ pathLength: checked ? 1 : 0 }}
-              transition={
-                reduced
-                  ? { duration: 0 }
-                  : { type: "spring", stiffness: 380, damping: 26, delay: checked ? 0.06 : 0 }
-              }
-            />
-          </svg>
+        <motion.span animate={pop} className="inline-block">
+          <motion.span
+            aria-hidden
+            animate={{
+              backgroundColor: checked ? "var(--accent)" : "var(--surface)",
+              borderColor: checked ? "var(--accent)" : "var(--border)",
+            }}
+            transition={{
+              // On uncheck, hold the fill for the full retract so the white tick
+              // is drawn back on the filled box, THEN the box un-fills.
+              backgroundColor: { duration: reduced ? 0 : 0.18, ease: [0.22, 1, 0.36, 1], delay: reduced || checked ? 0 : DRAW },
+              borderColor: { duration: reduced ? 0 : 0.18, ease: [0.22, 1, 0.36, 1], delay: reduced || checked ? 0 : DRAW },
+            }}
+            className="grid h-8 w-8 place-items-center rounded-[7px] border"
+          >
+            {/* Pure path-line draw: only pathLength animates — drawn forward on
+                check, retracted in reverse on uncheck. */}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <motion.path
+                d="M5 12.5 10 17.5 19 7"
+                stroke="var(--accent-fg)"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={false}
+                animate={{ pathLength: checked ? 1 : 0 }}
+                transition={
+                  reduced
+                    ? { duration: 0 }
+                    : { duration: DRAW, ease: checked ? [0.22, 1, 0.36, 1] : [0.65, 0, 0.35, 1], delay: checked ? 0.05 : 0 }
+                }
+              />
+            </svg>
+          </motion.span>
         </motion.span>
       </button>
     </Stage>

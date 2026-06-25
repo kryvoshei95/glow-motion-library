@@ -713,28 +713,29 @@ function CopyButtonAnim({ reduced, card }: PreviewProps) {
   const copied = card ? auto : copiedState;
   const fire = () => {
     setCopied(true);
-    setTimeout(() => setCopied(false), 1600);
+    setTimeout(() => setCopied(false), 1800);
   };
-  const blur = reduced ? "blur(0px)" : "blur(3px)";
+  const blur = reduced ? "blur(0px)" : "blur(4px)";
+  const swap = { duration: reduced ? 0 : 0.18, ease: [0.22, 1, 0.36, 1] as const };
   return (
     <Stage>
       <button
         onClick={fire}
-        className="flex items-center gap-2 border border-border bg-surface px-4 py-2 text-sm"
+        className="flex items-center gap-2 rounded-[10px] border border-border bg-surface px-3.5 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-surface-2"
       >
-        <span className="relative grid h-4 w-4 place-items-center text-fg">
+        <span className="relative grid h-[18px] w-[18px] place-items-center text-fg">
           <AnimatePresence mode="wait" initial={false}>
             {copied ? (
               <motion.svg
                 key="check"
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
-                initial={{ opacity: 0, scale: 0.6, filter: blur }}
+                initial={{ opacity: 0, scale: 0.5, filter: blur }}
                 animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ opacity: 0, scale: 0.6, filter: blur }}
-                transition={t(0.2, reduced)}
+                exit={{ opacity: 0, scale: 0.5, filter: blur }}
+                transition={swap}
                 className="absolute"
               >
                 <motion.path
@@ -745,33 +746,33 @@ function CopyButtonAnim({ reduced, card }: PreviewProps) {
                   strokeLinejoin="round"
                   initial={{ pathLength: reduced ? 1 : 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={t(0.3, reduced)}
+                  transition={{ duration: reduced ? 0 : 0.3, ease: [0.22, 1, 0.36, 1], delay: reduced ? 0 : 0.08 }}
                 />
               </motion.svg>
             ) : (
               <motion.svg
                 key="copy"
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="1.75"
+                strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                initial={{ opacity: 0, scale: 0.6, filter: blur }}
+                initial={{ opacity: 0, scale: 0.5, filter: blur }}
                 animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ opacity: 0, scale: 0.6, filter: blur }}
-                transition={t(0.2, reduced)}
+                exit={{ opacity: 0, scale: 0.5, filter: blur }}
+                transition={swap}
                 className="absolute"
               >
-                <rect x="9" y="9" width="11" height="11" />
-                <path d="M5 15V5h10" />
+                <rect x="9" y="9" width="11" height="11" rx="2.5" />
+                <path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2" />
               </motion.svg>
             )}
           </AnimatePresence>
         </span>
-        <span className="w-24 text-left">{copied ? "Скопійовано" : "Копіювати"}</span>
+        <span className="w-[92px] text-left">{copied ? "Скопійовано" : "Копіювати"}</span>
       </button>
     </Stage>
   );
@@ -795,7 +796,7 @@ function BaseSwitch({ reduced, card }: PreviewProps) {
       >
         <motion.span
           layout
-          transition={reduced ? { duration: 0.001 } : { type: "spring", stiffness: 500, damping: 32 }}
+          transition={reduced ? { duration: 0.001 } : { type: "spring", visualDuration: 0.32, bounce: 0.32 }}
           className="h-5 w-5 rounded-full bg-surface shadow-sm"
         />
       </motion.button>
@@ -828,7 +829,7 @@ function BaseRadio({ reduced, card }: PreviewProps) {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0, opacity: 0 }}
                     transition={
-                      reduced ? { duration: 0.001 } : { type: "spring", stiffness: 500, damping: 28 }
+                      reduced ? { duration: 0.001 } : { type: "spring", visualDuration: 0.28, bounce: 0.5 }
                     }
                     className="h-2.5 w-2.5 rounded-full bg-accent"
                   />
@@ -863,7 +864,10 @@ function ToastStack({ reduced, card }: PreviewProps) {
   return (
     <div className="flex h-full w-full flex-col items-center justify-end gap-4 p-6">
       {!card && (
-        <button onClick={add} className="border border-border bg-surface px-4 py-2 text-sm">
+        <button
+          onClick={add}
+          className="rounded-[10px] border border-border bg-surface px-4 py-2 text-sm shadow-sm transition-colors hover:bg-surface-2"
+        >
           Надіслати сповіщення
         </button>
       )}
@@ -886,10 +890,17 @@ function ToastStack({ reduced, card }: PreviewProps) {
               exit={{ opacity: 0, y: 24, scale: 0.92 }}
               transition={spring}
               style={{ zIndex: toasts.length - i }}
-              className="absolute inset-x-0 bottom-0 flex items-center gap-2 border border-border bg-surface px-3 py-2.5 text-sm shadow-lg"
+              className="absolute inset-x-0 bottom-0 flex items-center gap-3 rounded-xl border border-border bg-surface px-3.5 py-3 shadow-lg"
             >
-              <span className="text-fg">✓</span>
-              Збережено · #{id}
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-fg text-bg">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-fg">Збережено</p>
+                <p className="truncate text-xs text-muted">Зміни застосовано · #{id}</p>
+              </div>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -948,7 +959,7 @@ function ErrorShake({ card }: PreviewProps) {
   return (
     <Stage>
       <div ref={wrapRef} className="t-input-wrap flex w-full max-w-[260px] flex-col gap-2">
-        <div className="t-input flex items-center gap-1 border bg-surface p-1">
+        <div className="t-input flex items-center gap-1 rounded-[10px] border bg-surface p-1">
           <input
             value={value}
             onChange={(e) => {
@@ -964,7 +975,7 @@ function ErrorShake({ card }: PreviewProps) {
             onClick={() => {
               if (!/\S+@\S+\.\S+/.test(value)) showError();
             }}
-            className="shrink-0 border border-border bg-surface-2 px-3 py-1 text-xs"
+            className="shrink-0 rounded-[7px] border border-border bg-surface-2 px-3 py-1 text-xs"
           >
             Перевірити
           </button>

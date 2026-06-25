@@ -175,5 +175,111 @@
     },
     "tags": ["toast", "stack", "notification", "spring"],
     "preview": { "component": "ToastStack" }
+  },
+  {
+    "slug": "error-state-shake",
+    "name": "Error State Shake",
+    "category": "inputs",
+    "interactive": true,
+    "useCase": "Валідація форми: інпут трясеться вліво-вправо з овершутом, рамка червоніє, знизу з'являється повідомлення.",
+    "trigger": "on event",
+    "duration": { "value": 300, "token": "moderate", "unit": "ms" },
+    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
+    "motionProperties": [
+      { "property": "translateX", "from": "0", "to": "±6px (овершут 4px)" },
+      { "property": "border-color", "from": "border", "to": "error" }
+    ],
+    "complexity": "advanced",
+    "platform": "both",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — прибрати трясіння, лишити зміну рамки та текст помилки; не передавати помилку лише кольором, дублювати текстом і aria."
+    },
+    "devHandoff": {
+      "note": "transitions.dev error-state-shake: мультисегментний keyframe (80·2+60·2=280ms) з per-stop easing; авто-ревёрт за --revert-hold; ввід тексту скасовує помилку.",
+      "css": ".t-input{transition:border-color 150ms ease-out;will-change:transform}\n.t-input.is-error{border-color:var(--error);transition:border-color 280ms ease-out}\n.t-input.is-shaking{animation:shake calc(80ms*2 + 60ms*2) linear}\n@keyframes shake{0%{transform:translateX(0);animation-timing-function:cubic-bezier(.22,1,.36,1)}28.57%{transform:translateX(6px);animation-timing-function:cubic-bezier(.22,1,.36,1)}57.14%{transform:translateX(-6px);animation-timing-function:cubic-bezier(.22,1,.36,1)}78.57%{transform:translateX(4px);animation-timing-function:cubic-bezier(.22,1,.36,1)}100%{transform:translateX(0)}}\n@media (prefers-reduced-motion:reduce){.t-input{animation:none!important;transform:none!important}}",
+      "tailwind": "Кастомний keyframe (shake) у tailwind.config; на тригер додати клас is-shaking + is-error, прибрати через reflow для повтору.",
+      "framerMotion": { "animate": { "x": [0, 6, -6, 4, 0] }, "transition": { "duration": 0.28, "times": [0, 0.2857, 0.5714, 0.7857, 1], "ease": [0.22, 1, 0.36, 1] } },
+      "gsap": "gsap.fromTo(input,{x:0},{keyframes:{x:[6,-6,4,0]},duration:0.28,ease:'power2.out'})",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Тримати помилку доступною: текст + aria-live, не лише колір.", "Скасовувати помилку, коли користувач починає виправляти."],
+      "dont": ["Не трясти сильно/довго — короткий перкусивний хінт.", "Не лишати трясіння у циклі."]
+    },
+    "tags": ["error", "shake", "validation", "form"],
+    "preview": { "component": "ErrorShake" }
+  },
+  {
+    "slug": "avatar-group-hover",
+    "name": "Avatar Group Hover",
+    "category": "hover",
+    "interactive": true,
+    "useCase": "Наведення на елемент горизонтального ряду піднімає його й сусідів зі спадом сили, а повернення — з пружним овершутом.",
+    "trigger": "hover",
+    "duration": { "value": 300, "token": "moderate", "unit": "ms" },
+    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
+    "motionProperties": [
+      { "property": "translateY", "from": "0px", "to": "-4px × falloff^distance" },
+      { "property": "scale", "from": 1, "to": 1.05 }
+    ],
+    "complexity": "advanced",
+    "platform": "web",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "keep",
+      "note": "Безпечно лишати — декоративний hover; на touch не спрацьовує, тож не нести через нього сенсу."
+    },
+    "devHandoff": {
+      "note": "transitions.dev avatar-group-hover: lift × falloff^distance, напрямок-залежний easing — чистий ease-in на підйом, пружний ease-out на повернення. transition-timing-function ставиться інлайн ПЕРЕД записом --shift/--scale.",
+      "css": ".t-avatar{transform:translateY(var(--shift,0)) scale(var(--scale-active,1));transition:transform 320ms var(--avatar-ease-in);will-change:transform}\n/* JS: на mouseenter — el.style.setProperty('--shift', (lift*falloff**dist)+'px'); ease-in. на mouseleave root — reset, ease-out cubic-bezier(0.34,3.85,0.64,1) */",
+      "tailwind": "transition-transform duration-300 will-change-transform; значення --shift/--scale-active та timing-function писати інлайн з JS.",
+      "framerMotion": { "note": "Краще через CSS-vars + inline timing-function (напрямок-залежний easing); Framer варіант — animate кожного елемента з custom за distance." },
+      "gsap": "items.forEach((el,i)=>el.addEventListener('mouseenter',()=>gsap.to(items,{y:i=>lift*falloff**Math.abs(i-idx),duration:0.32})))",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Дублювати ефект на focus-visible для клавіатури.", "Тримати підйом тонким (≈4px)."],
+      "dont": ["Не покладатись лише на hover — touch його не має."]
+    },
+    "tags": ["avatar", "hover", "group", "spring"],
+    "preview": { "component": "AvatarGroupHover" }
+  },
+  {
+    "slug": "dropdown-menu-morph",
+    "name": "Dropdown Menu Morph",
+    "category": "menus",
+    "interactive": true,
+    "useCase": "Кругла кнопка-тригер «+» морфиться у саму панель меню: бокс росте, радіус розслабляється, плюс кросфейдиться з обертанням, контент в'їжджає.",
+    "trigger": "click/tap",
+    "duration": { "value": 300, "token": "moderate", "unit": "ms" },
+    "easing": { "token": "ease-smooth", "cubicBezier": [0.34, 1.25, 0.64, 1] },
+    "motionProperties": [
+      { "property": "width/height", "from": "44px", "to": "панель" },
+      { "property": "border-radius", "from": "40px", "to": "12px" },
+      { "property": "opacity/blur (плюс↔меню)", "from": "0 / blur(2px)", "to": "1 / blur(0)" }
+    ],
+    "complexity": "advanced",
+    "platform": "both",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — без морфу розміру/блюру, миттєвий показ панелі; тримати aria-expanded, фокус і закриття по Esc/кліку поза."
+    },
+    "devHandoff": {
+      "note": "transitions.dev plus-to-menu morph: один елемент і тригер, і панель. Розкриття бунчастим ease (0.34,1.25,0.64,1), закриття — спокійним (0.22,1,0.36,1). overflow:hidden клипає контент під час морфу.",
+      "css": ".t-morph{position:relative;width:44px;height:44px;border-radius:40px;overflow:hidden;transition:width 250ms var(--morph-close-ease),height 250ms var(--morph-close-ease),border-radius 250ms var(--morph-close-ease)}\n.t-morph[data-open=true]{width:208px;height:150px;border-radius:12px;transition:width 350ms var(--morph-ease),height 350ms var(--morph-ease),border-radius 350ms var(--morph-ease)}\n.t-morph-menu{position:absolute;inset:0;opacity:0;transform:translateX(40px) scale(0.97);filter:blur(2px);transition:opacity 200ms,transform 350ms,filter 200ms}\n.t-morph[data-open=true] .t-morph-menu{opacity:1;transform:none;filter:blur(0)}",
+      "tailwind": "Розміри/радіус через data-[open] варіанти + кастомні ease у config; плюс і меню — окремі шари з opacity/blur/translate.",
+      "framerMotion": { "container": { "animate": { "width": "open?208:44", "height": "open?150:44", "borderRadius": "open?12:40" }, "transition": { "duration": 0.35, "ease": [0.34, 1.25, 0.64, 1] } } },
+      "gsap": "gsap.to(morph,{width:208,height:150,borderRadius:12,duration:0.35,ease:'back.out(1.4)'})",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Закривати по кліку поза та Esc, дзеркалити стан в aria-expanded.", "Різні ease на розкриття (бунчастий) і закриття (спокійний)."],
+      "dont": ["Не використовувати, якщо тригер і панель — різні елементи (тоді звичайний dropdown)."]
+    },
+    "tags": ["dropdown", "menu", "morph", "fab"],
+    "preview": { "component": "PlusMenuMorph" }
   }
 ]

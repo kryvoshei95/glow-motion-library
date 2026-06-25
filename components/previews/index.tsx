@@ -898,6 +898,196 @@ function ToastStack({ reduced, card }: PreviewProps) {
   );
 }
 
+/* 26. Error state shake (transitions.dev) — per-segment shake + revert */
+function ErrorShake({ card }: PreviewProps) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [value, setValue] = useState("");
+  const auto = useAutoOpen(card, 500);
+
+  const showError = () => {
+    const wrap = wrapRef.current as
+      | (HTMLDivElement & { _t?: ReturnType<typeof setTimeout> | null })
+      | null;
+    if (!wrap) return;
+    const input = wrap.querySelector<HTMLElement>(".t-input");
+    if (!input) return;
+    wrap.classList.add("is-error");
+    input.classList.add("is-error");
+    // replay the shake from a clean baseline
+    input.classList.remove("is-shaking");
+    void input.offsetWidth;
+    input.classList.add("is-shaking");
+    const shakeMs = 80 * 2 + 60 * 2;
+    setTimeout(() => input.classList.remove("is-shaking"), shakeMs + 20);
+    // auto-revert after the hold
+    if (wrap._t) clearTimeout(wrap._t);
+    wrap._t = setTimeout(() => {
+      wrap.classList.remove("is-error");
+      input.classList.remove("is-error");
+    }, shakeMs + 3000);
+  };
+
+  const clearError = () => {
+    const wrap = wrapRef.current as
+      | (HTMLDivElement & { _t?: ReturnType<typeof setTimeout> | null })
+      | null;
+    if (!wrap) return;
+    if (wrap._t) {
+      clearTimeout(wrap._t);
+      wrap._t = null;
+    }
+    wrap.classList.remove("is-error");
+    wrap.querySelector(".t-input")?.classList.remove("is-error");
+  };
+
+  useEffect(() => {
+    if (card && auto) showError();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [card, auto]);
+
+  return (
+    <Stage>
+      <div ref={wrapRef} className="t-input-wrap flex w-full max-w-[260px] flex-col gap-2">
+        <div className="t-input flex items-center gap-1 border bg-surface p-1">
+          <input
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+              clearError();
+            }}
+            placeholder="email@example.com"
+            aria-label="Email"
+            className="min-w-0 flex-1 bg-transparent px-2 py-1 text-sm outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              if (!/\S+@\S+\.\S+/.test(value)) showError();
+            }}
+            className="shrink-0 border border-border bg-surface-2 px-3 py-1 text-xs"
+          >
+            Перевірити
+          </button>
+        </div>
+        <p className="t-error-msg text-xs">Введіть коректний email.</p>
+      </div>
+    </Stage>
+  );
+}
+
+/* 27. Avatar group hover (transitions.dev) — falloff lift, bouncy return */
+function AvatarGroupHover({ card }: PreviewProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const labels = ["АК", "МР", "ІВ", "ОЛ", "ДС"];
+
+  const setShifts = (activeIdx: number | null, phase: "in" | "out") => {
+    const root = rootRef.current;
+    if (!root) return;
+    const cs = getComputedStyle(document.documentElement);
+    const num = (n: string, fb: number) => {
+      const v = parseFloat(cs.getPropertyValue(n));
+      return Number.isFinite(v) ? v : fb;
+    };
+    const ease = (n: string, fb: string) => cs.getPropertyValue(n).trim() || fb;
+    const lift = num("--avatar-lift", -4);
+    const falloff = num("--avatar-falloff", 0.45);
+    const scale = num("--avatar-scale", 1.05);
+    const tf =
+      phase === "out"
+        ? ease("--avatar-ease-out", "cubic-bezier(0.34, 3.85, 0.64, 1)")
+        : ease("--avatar-ease-in", "cubic-bezier(0.22, 1, 0.36, 1)");
+    root.querySelectorAll<HTMLElement>(".t-avatar").forEach((el, i) => {
+      el.style.transitionTimingFunction = tf;
+      if (activeIdx == null) {
+        el.style.setProperty("--shift", "0px");
+        el.style.setProperty("--scale-active", "1");
+        el.style.zIndex = "";
+        return;
+      }
+      const d = Math.abs(i - activeIdx);
+      el.style.setProperty("--shift", (lift * Math.pow(falloff, d)).toFixed(3) + "px");
+      el.style.setProperty("--scale-active", i === activeIdx ? String(scale) : "1");
+      el.style.zIndex = i === activeIdx ? "1" : "0";
+    });
+  };
+
+  const auto = useAutoOpen(card, 400);
+  useEffect(() => {
+    if (!card || !auto) return;
+    setShifts(2, "in");
+    const id = setTimeout(() => setShifts(null, "out"), 1100);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [card, auto]);
+
+  return (
+    <Stage>
+      <div ref={rootRef} onMouseLeave={() => setShifts(null, "out")} className="flex">
+        {labels.map((l, i) => (
+          <div
+            key={l}
+            className="t-avatar -ml-2 first:ml-0"
+            onMouseEnter={() => setShifts(i, "in")}
+          >
+            <div className="grid h-11 w-11 place-items-center rounded-full border-2 border-bg bg-surface-2 text-xs font-medium text-fg">
+              {l}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Stage>
+  );
+}
+
+/* 28. Plus → menu morph (transitions.dev) — trigger grows into a panel */
+function PlusMenuMorph({ card }: PreviewProps) {
+  const [openState, setOpen] = useState(false);
+  const auto = useAutoOpen(card, 450);
+  const open = card ? auto : openState;
+  const items = ["Новий файл", "Завантажити", "Поділитися"];
+  return (
+    <Stage>
+      <div
+        className="t-morph border border-border bg-surface shadow-lg"
+        data-open={open ? "true" : "false"}
+      >
+        <div className="t-morph-menu flex flex-col p-2">
+          <span className="px-2 pb-1 pt-0.5 text-[11px] uppercase tracking-wide text-muted">
+            Дії
+          </span>
+          {items.map((it) => (
+            <button
+              key={it}
+              className="rounded-[6px] px-2 py-1.5 text-left text-sm hover:bg-surface-2"
+            >
+              {it}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="t-morph-plus"
+          aria-expanded={open}
+          aria-label={open ? "Закрити меню" : "Відкрити меню"}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+      </div>
+    </Stage>
+  );
+}
+
 export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   FadeInUp,
   StaggerListReveal,
@@ -924,6 +1114,9 @@ export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   BaseSwitch,
   BaseRadio,
   ToastStack,
+  ErrorShake,
+  AvatarGroupHover,
+  PlusMenuMorph,
 };
 
 export function getPreview(name: string) {

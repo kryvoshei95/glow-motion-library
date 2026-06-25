@@ -644,8 +644,8 @@ function BaseCheckbox({ reduced, card }: PreviewProps) {
       <button
         role="checkbox"
         aria-checked={checked}
+        aria-label="Чекбокс"
         onClick={() => setChecked((v) => !v)}
-        className="flex items-center gap-3 text-sm"
       >
         <motion.span
           aria-hidden
@@ -656,15 +656,17 @@ function BaseCheckbox({ reduced, card }: PreviewProps) {
             scale: !reduced && checked ? [1, 1.18, 0.97, 1] : 1,
           }}
           transition={{
-            backgroundColor: { duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] },
-            borderColor: { duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] },
+            // On uncheck, hold the fill so the tick retracts on the filled box
+            // first (visible reverse-draw), then the box un-fills.
+            backgroundColor: { duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1], delay: reduced || checked ? 0 : 0.18 },
+            borderColor: { duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1], delay: reduced || checked ? 0 : 0.18 },
             scale: { duration: reduced ? 0 : 0.42, times: [0, 0.35, 0.7, 1], ease: "easeOut" },
           }}
-          className="grid h-6 w-6 place-items-center border"
+          className="grid h-8 w-8 place-items-center rounded-[7px] border"
         >
           {/* Pure path-line draw (motion.dev base-checkbox): only pathLength
-              animates — no opacity fade — so the tick is "drawn", not faded. */}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              animates — drawn forward on check, retracted (reverse) on uncheck. */}
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <motion.path
               d="M5 12.5 10 17.5 19 7"
               stroke="var(--accent-fg)"
@@ -681,7 +683,6 @@ function BaseCheckbox({ reduced, card }: PreviewProps) {
             />
           </svg>
         </motion.span>
-        Погоджуюсь з умовами
       </button>
     </Stage>
   );

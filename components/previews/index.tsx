@@ -1059,19 +1059,32 @@ function NumberPriceSwitcher({ reduced, card }: PreviewProps) {
 }
 
 /* 28. Context menu (motion.dev / Base UI) — right-click, scale+fade from origin */
+/* Base UI Context Menu (motion.dev/examples/react-base-context-menu)
+   Reconstructed from the public live preview (examples.motion.dev/react/base-context-menu)
+   via Playwright DOM/computed-style/screenshot analysis. Original Motion+ source not available.
+   Measured: trigger "Right-click here"; menu panel radius 6, border 1px rgb(30,36,39),
+   backdrop-blur(10px), padding 4; rows 8/12 radius 4, 14px; shortcuts right (12px, muted);
+   items Back ⌘+[, Forward ⌘+], Reload ⌘+R, More Tools ›, sep, ✓Show Bookmarks ⌘+B (pink), Show Full URLs. */
 function ContextMenu({ reduced, card }: PreviewProps) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const auto = useAutoOpen(card, 500);
   useEffect(() => {
     if (card && auto) {
-      setPos({ x: 64, y: 44 });
+      setPos({ x: 70, y: 40 });
       setOpen(true);
     }
   }, [card, auto]);
-  const items = ["Копіювати", "Перейменувати", "Дублювати", "Видалити"];
+
+  const ROW = "flex items-center justify-between gap-6 rounded-[4px] px-3 py-1.5 text-[14px] text-white transition-colors hover:bg-white/[0.07]";
+  const KBD = { color: "rgb(150,160,158)", fontSize: 12 } as const;
+
   return (
-    <Stage>
+    <div
+      className="relative h-full w-full"
+      style={{ background: "rgb(11, 16, 18)", fontFamily: "Inter, sans-serif" }}
+      onClick={() => setOpen(false)}
+    >
       <div
         onContextMenu={(e) => {
           e.preventDefault();
@@ -1079,36 +1092,53 @@ function ContextMenu({ reduced, card }: PreviewProps) {
           setPos({ x: e.clientX - r.left, y: e.clientY - r.top });
           setOpen(true);
         }}
-        onClick={() => setOpen(false)}
-        className="pointer-events-auto relative grid h-full w-full place-items-center rounded-xl border border-dashed border-border text-xs text-muted"
+        className="absolute inset-6 grid place-items-center rounded-[8px] text-[14px]"
+        style={{ border: "1px solid rgb(30,36,39)", color: "rgb(237,237,236)" }}
       >
-        Натисни правою кнопкою
+        Right-click here
         <AnimatePresence>
           {open && (
-            <motion.ul
-              initial={{ opacity: 0, scale: 0.95 }}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={reduced ? { duration: 0.001 } : { type: "spring", visualDuration: 0.22, bounce: 0.2 }}
-              style={{ left: pos.x, top: pos.y, transformOrigin: "top left" }}
-              className="absolute z-10 w-40 overflow-hidden rounded-xl border border-border bg-surface py-1 text-sm text-fg shadow-lg"
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={reduced ? { duration: 0.001 } : { type: "spring", stiffness: 520, damping: 34 }}
+              style={{
+                left: pos.x,
+                top: pos.y,
+                transformOrigin: "top left",
+                width: 207,
+                background: "rgba(17, 22, 24, 0.8)",
+                border: "1px solid rgb(30, 36, 39)",
+                borderRadius: 6,
+                padding: 4,
+                backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
+                boxShadow: "rgba(0,0,0,0.4) 0px 12px 32px",
+              }}
+              className="absolute z-10"
+              onClick={(e) => e.stopPropagation()}
             >
-              {items.map((it) => (
-                <li key={it}>
-                  <button
-                    className={`block w-full px-3 py-1.5 text-left transition-colors hover:bg-surface-2 ${
-                      it === "Видалити" ? "text-[color:var(--error)]" : ""
-                    }`}
-                  >
-                    {it}
-                  </button>
-                </li>
-              ))}
-            </motion.ul>
+              <div className={ROW}><span>Back</span><span style={KBD}>⌘+[</span></div>
+              <div className={ROW}><span>Forward</span><span style={KBD}>⌘+]</span></div>
+              <div className={ROW}><span>Reload</span><span style={KBD}>⌘+R</span></div>
+              <div className={ROW}><span>More Tools</span><span style={{ color: "rgb(150,160,158)" }}>›</span></div>
+              <div style={{ height: 1, background: "rgb(30,36,39)", margin: "4px 0" }} />
+              <div className={ROW}>
+                <span className="flex items-center gap-2">
+                  <span style={{ color: "#ec4899", width: 14 }}>✓</span>
+                  Show Bookmarks
+                </span>
+                <span style={KBD}>⌘+B</span>
+              </div>
+              <div className={ROW}>
+                <span className="pl-[22px]">Show Full URLs</span>
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
-    </Stage>
+    </div>
   );
 }
 

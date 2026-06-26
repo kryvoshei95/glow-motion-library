@@ -226,8 +226,8 @@
   },
   {
     "slug": "context-menu",
-    "name": "Context Menu",
-    "tagline": "Контекстне меню по ПКМ",
+    "name": "Base UI Context Menu",
+    "tagline": "Base UI контекстне меню по ПКМ",
     "category": "dropdown",
     "interactive": true,
     "useCase": "Контекстне меню по правому кліку: відкривається масштабуванням від точки кліку (origin) + fade.",
@@ -257,8 +257,11 @@
       "do": ["Ставити transform-origin у точку кліку.", "Закривати по Esc і кліку поза меню."],
       "dont": ["Не блокувати нативне меню без альтернативи для клавіатури."]
     },
-    "tags": ["context", "menu", "dropdown", "right-click"],
-    "preview": { "component": "ContextMenu" }
+    "tags": ["context", "menu", "dropdown", "right-click", "base-ui"],
+    "preview": { "component": "ContextMenu" },
+    "referenceUrl": "https://motion.dev/examples/react-base-context-menu",
+    "standalonePreviewUrl": "https://examples.motion.dev/react/base-context-menu",
+    "matchStatus": "Pixel/motion matched from public live reference"
   },
   {
     "slug": "multi-state-badge",

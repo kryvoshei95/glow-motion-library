@@ -336,5 +336,44 @@
     },
     "tags": ["number", "price", "switcher", "toggle"],
     "preview": { "component": "NumberPriceSwitcher" }
+  },
+  {
+    "slug": "tab-select",
+    "name": "Tab Select",
+    "tagline": "Індикатор їде між табами через layoutId",
+    "category": "tab",
+    "interactive": true,
+    "useCase": "Сегментований таб-селектор: рожевий індикатор фізично переїжджає між табами (Home/React/Vue/Svelte) через shared layout (layoutId), whileTap на натисканні.",
+    "trigger": "click/tap",
+    "duration": { "value": 300, "token": "moderate", "unit": "ms" },
+    "easing": { "token": "spring", "cubicBezier": [0.22, 1, 0.36, 1] },
+    "motionProperties": [
+      { "property": "layout x/width (indicator)", "from": "tab A", "to": "tab B" },
+      { "property": "scale (whileTap)", "from": 1, "to": 0.95 }
+    ],
+    "complexity": "medium",
+    "platform": "both",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — індикатор перемикається миттєво без spring; зберігати role=tab, клавіатурну навігацію та видимий фокус."
+    },
+    "devHandoff": {
+      "note": "motion.dev tab-select (reconstructed from public preview): <motion.span layoutId> як індикатор усередині активного таба; контейнер rgb(15,24,21) r10 pad5 border rgb(28,38,35); індикатор rgb(255,0,136) r5; таби 40h 16px white.",
+      "css": "/* shared-layout indicator needs JS (Motion layoutId); CSS-only fallback: .indicator{transition:transform 300ms,width 300ms} positioned to active tab */",
+      "tailwind": "Контейнер: inline-flex rounded-[10px] p-[5px] gap-[5px] border; індикатор: absolute inset-0 rounded-[5px] bg-[rgb(255,0,136)]",
+      "framerMotion": { "indicator": "<motion.span layoutId=\"tab-select-indicator\"/> у активному табі", "transition": { "type": "spring", "stiffness": 500, "damping": 35 }, "whileTap": { "scale": 0.95 } },
+      "gsap": "Flip.fit(indicator, activeTab, {duration:0.3, ease:'power3.out'})",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Рендерити індикатор у активному табі з layoutId, щоб він переїжджав, а не пересоздавався."],
+      "dont": ["Не анімувати фон кожного таба окремо — це ламає shared-layout ефект."]
+    },
+    "tags": ["tab", "select", "segmented", "layout", "indicator"],
+    "preview": { "component": "TabSelect" },
+    "referenceUrl": "https://motion.dev/examples/react-tab-select",
+    "standalonePreviewUrl": "https://examples.motion.dev/react/tab-select",
+    "matchStatus": "Pixel/motion matched from public live reference"
   }
 ]

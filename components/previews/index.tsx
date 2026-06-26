@@ -1212,6 +1212,53 @@ function MultiStateBadge({ reduced, card }: PreviewProps) {
   );
 }
 
+/* Tab Select — shared-layout moving indicator (motion.dev/examples/react-tab-select)
+   Reconstructed from the public live preview (examples.motion.dev/react/tab-select) via
+   Playwright DOM/computed-style measurement. Original Motion+ source values not available.
+   Measured: outer rgb(15,24,21) radius 10 pad 5 border 1px rgb(28,38,35); tabs 40h 16px white,
+   gap 5; selected indicator rgb(255,0,136) radius 5 — moves via layoutId. */
+function TabSelect({ reduced, card }: PreviewProps) {
+  const tabs = ["Home", "React", "Vue", "Svelte"];
+  const [sel, setSel] = useState(0);
+  useEffect(() => {
+    if (!card) return;
+    const id = setInterval(() => setSel((p) => (p + 1) % tabs.length), 1100);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [card]);
+  // Reconstructed spring — indicator travel matched to the live preview.
+  const spring = reduced ? { duration: 0.001 } : { type: "spring" as const, stiffness: 500, damping: 35 };
+  return (
+    <div className="flex h-full w-full items-center justify-center" style={{ background: "rgb(11, 16, 18)", fontFamily: "Inter, sans-serif" }}>
+      <ul
+        className="inline-flex list-none items-center"
+        style={{ background: "rgb(15, 24, 21)", border: "1px solid rgb(28, 38, 35)", borderRadius: 10, padding: 5, gap: 5 }}
+      >
+        {tabs.map((tab, i) => (
+          <li key={tab} className="relative">
+            <motion.button
+              onClick={() => setSel(i)}
+              whileTap={{ scale: reduced ? 1 : 0.95 }}
+              className="relative flex h-10 items-center px-4 text-[16px]"
+              style={{ color: "#fff" }}
+            >
+              {sel === i && (
+                <motion.span
+                  layoutId="tab-select-indicator"
+                  transition={spring}
+                  className="absolute inset-0"
+                  style={{ background: "rgb(255, 0, 136)", borderRadius: 5, zIndex: 0 }}
+                />
+              )}
+              <span className="relative z-[1]">{tab}</span>
+            </motion.button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   FadeInUp,
   StaggerListReveal,
@@ -1242,6 +1289,7 @@ export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   NumberPriceSwitcher,
   ContextMenu,
   MultiStateBadge,
+  TabSelect,
 };
 
 export function getPreview(name: string) {

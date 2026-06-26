@@ -63,6 +63,8 @@ export interface Animation {
   preview: { component: string };
   /** Motion.dev reference this preview is matched against. */
   referenceUrl?: string;
+  /** Public standalone preview iframe that was measured for the reconstruction. */
+  standalonePreviewUrl?: string;
   /** Honest fidelity status — never "Source-identical" unless real source was available. */
   matchStatus?:
     | "Pixel/motion matched from public live reference"

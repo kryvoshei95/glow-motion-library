@@ -1114,62 +1114,71 @@ function ContextMenu({ reduced, card }: PreviewProps) {
 
 /* 29. Multi-state badge (motion.dev) — layout width resize + content/colour swap */
 function MultiStateBadge({ reduced, card }: PreviewProps) {
-  const [state, setState] = useState<"idle" | "loading" | "done">("idle");
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const auto = useAutoOpen(card, 600);
-  const run = () => {
-    timers.current.forEach(clearTimeout);
-    timers.current = [];
-    setState("loading");
-    timers.current.push(setTimeout(() => setState("done"), 1400));
-    timers.current.push(setTimeout(() => setState("idle"), 3000));
-  };
+  // Reconstructed from the public Motion.dev live preview (examples.motion.dev/react/multi-state-badge)
+  // via Playwright DOM/computed-style/screenshot analysis. Original Motion+ source values not available.
+  // Measured: white pill bg #fff, text rgb(11,16,18), radius 999px, padding 12/20.
+  // Click-advanced cycle (each click → next state); pill width layout-animates:
+  // Start(76) → Processing(152, spinner) → Done(108, check) → "Something went wrong"(243, ✕) → Start.
+  const STATES = [
+    { key: "start", label: "Start", icon: "none" as const },
+    { key: "processing", label: "Processing", icon: "spinner" as const },
+    { key: "done", label: "Done", icon: "check" as const },
+    { key: "error", label: "Something went wrong", icon: "x" as const },
+  ];
+  const [i, setI] = useState(0);
+  const advance = () => setI((p) => (p + 1) % STATES.length);
   useEffect(() => {
-    if (card && auto) run();
-    return () => timers.current.forEach(clearTimeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [card, auto]);
-  const cfg = {
-    idle: { label: "Почати", bg: "var(--surface)", fg: "var(--fg)" },
-    loading: { label: "Обробка…", bg: "var(--surface-2)", fg: "var(--muted)" },
-    done: { label: "Готово", bg: "var(--accent)", fg: "var(--accent-fg)" },
-  }[state];
+    if (!card) return;
+    const id = setInterval(advance, 1300);
+    return () => clearInterval(id);
+  }, [card]);
+  const s = STATES[i];
+  // Reconstructed layout spring (width settle matched to live preview).
+  const layoutSpring = reduced ? { duration: 0.001 } : { type: "spring" as const, stiffness: 550, damping: 38 };
+
   return (
-    <Stage>
+    <div
+      className="flex h-full w-full items-center justify-center"
+      style={{ background: "rgb(11, 16, 18)", fontFamily: "Inter, sans-serif" }}
+    >
       <motion.button
         layout
-        onClick={() => state === "idle" && run()}
-        animate={{ backgroundColor: cfg.bg, color: cfg.fg }}
-        transition={{
-          layout: reduced ? { duration: 0.001 } : { type: "spring", visualDuration: 0.3, bounce: 0.25 },
-          duration: reduced ? 0 : 0.25,
-        }}
-        className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-medium shadow-sm"
+        onClick={advance}
+        transition={{ layout: layoutSpring }}
+        style={{ background: "#fff", color: "rgb(11, 16, 18)", borderRadius: 999, padding: "12px 20px", fontSize: 16, lineHeight: 1 }}
+        className="inline-flex items-center overflow-hidden"
       >
-        {state === "loading" && (
-          <span className="h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent" />
-        )}
-        {state === "done" && (
-          <motion.svg
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={reduced ? { duration: 0 } : { type: "spring", visualDuration: 0.3, bounce: 0.5 }}
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="shrink-0"
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.span
+            key={s.key}
+            layout
+            initial={{ opacity: 0, filter: reduced ? "blur(0px)" : "blur(4px)" }}
+            animate={{ opacity: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, filter: reduced ? "blur(0px)" : "blur(4px)" }}
+            transition={{ duration: reduced ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="inline-flex items-center gap-2 whitespace-nowrap"
           >
-            <path d="M20 6 9 17l-5-5" />
-          </motion.svg>
-        )}
-        <motion.span layout>{cfg.label}</motion.span>
+            {s.icon === "spinner" && (
+              <svg className="h-[15px] w-[15px] shrink-0 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2.5" />
+                <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+            )}
+            {s.icon === "check" && (
+              <svg className="h-[15px] w-[15px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            )}
+            {s.icon === "x" && (
+              <svg className="h-[15px] w-[15px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            )}
+            {s.label}
+          </motion.span>
+        </AnimatePresence>
       </motion.button>
-    </Stage>
+    </div>
   );
 }
 

@@ -36,6 +36,7 @@
     "tags": ["toast", "stack", "notification", "spring"],
     "preview": { "component": "ToastStack" },
     "referenceUrl": "https://motion.dev/examples/react-toast-stack",
+    "standalonePreviewUrl": "https://examples.motion.dev/react/toast-stack",
     "matchStatus": "Pixel/motion matched from public live reference"
   },
   {
@@ -111,6 +112,7 @@
     "tags": ["copy", "button", "icon-swap", "feedback"],
     "preview": { "component": "CopyButtonAnim" },
     "referenceUrl": "https://motion.dev/examples/react-copy-button",
+    "standalonePreviewUrl": "https://examples.motion.dev/react/copy-button",
     "matchStatus": "Pixel/motion matched from public live reference"
   },
   {
@@ -292,7 +294,10 @@
       "dont": ["Не передавати стан лише кольором — додавати іконку/текст."]
     },
     "tags": ["badge", "states", "button", "layout"],
-    "preview": { "component": "MultiStateBadge" }
+    "preview": { "component": "MultiStateBadge" },
+    "referenceUrl": "https://motion.dev/examples/react-multi-state-badge",
+    "standalonePreviewUrl": "https://examples.motion.dev/react/multi-state-badge",
+    "matchStatus": "Pixel/motion matched from public live reference"
   },
   {
     "slug": "number-price-switcher",

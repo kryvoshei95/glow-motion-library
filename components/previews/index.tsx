@@ -716,15 +716,24 @@ function CopyButtonAnim({ reduced, card }: PreviewProps) {
     setTimeout(() => setCopied(false), 1800);
   };
   const blur = reduced ? "blur(0px)" : "blur(4px)";
-  const swap = { duration: reduced ? 0 : 0.18, ease: [0.22, 1, 0.36, 1] as const };
+  // Bouncy spring on the icon swap; the button also changes colour (fills) on copy.
+  const bounce = reduced
+    ? { duration: 0 }
+    : { type: "spring" as const, visualDuration: 0.4, bounce: 0.55 };
   return (
     <Stage>
-      <button
+      <motion.button
         onClick={fire}
-        className="flex items-center gap-2 rounded-[10px] border border-border bg-surface px-3.5 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-surface-2"
+        animate={{
+          backgroundColor: copied ? "var(--accent)" : "var(--surface)",
+          color: copied ? "var(--accent-fg)" : "var(--fg)",
+          borderColor: copied ? "var(--accent)" : "var(--border)",
+        }}
+        transition={{ duration: reduced ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+        className="flex items-center gap-2 rounded-[10px] border px-3.5 py-2 text-sm font-medium shadow-sm"
       >
-        <span className="relative grid h-[18px] w-[18px] place-items-center text-fg">
-          <AnimatePresence mode="wait" initial={false}>
+        <span className="relative grid h-[18px] w-[18px] place-items-center">
+          <AnimatePresence mode="popLayout" initial={false}>
             {copied ? (
               <motion.svg
                 key="check"
@@ -732,21 +741,20 @@ function CopyButtonAnim({ reduced, card }: PreviewProps) {
                 height="18"
                 viewBox="0 0 24 24"
                 fill="none"
-                initial={{ opacity: 0, scale: 0.5, filter: blur }}
+                initial={{ opacity: 0, scale: 0.3, filter: blur }}
                 animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ opacity: 0, scale: 0.5, filter: blur }}
-                transition={swap}
-                className="absolute"
+                exit={{ opacity: 0, scale: 0.3, filter: blur }}
+                transition={bounce}
               >
                 <motion.path
                   d="M20 6 9 17l-5-5"
                   stroke="currentColor"
-                  strokeWidth="2.2"
+                  strokeWidth="2.4"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   initial={{ pathLength: reduced ? 1 : 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: reduced ? 0 : 0.3, ease: [0.22, 1, 0.36, 1], delay: reduced ? 0 : 0.08 }}
+                  transition={{ duration: reduced ? 0 : 0.3, ease: [0.22, 1, 0.36, 1], delay: reduced ? 0 : 0.06 }}
                 />
               </motion.svg>
             ) : (
@@ -760,11 +768,10 @@ function CopyButtonAnim({ reduced, card }: PreviewProps) {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                initial={{ opacity: 0, scale: 0.5, filter: blur }}
+                initial={{ opacity: 0, scale: 0.3, filter: blur }}
                 animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ opacity: 0, scale: 0.5, filter: blur }}
-                transition={swap}
-                className="absolute"
+                exit={{ opacity: 0, scale: 0.3, filter: blur }}
+                transition={bounce}
               >
                 <rect x="9" y="9" width="11" height="11" rx="2.5" />
                 <path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2" />
@@ -773,7 +780,7 @@ function CopyButtonAnim({ reduced, card }: PreviewProps) {
           </AnimatePresence>
         </span>
         <span className="w-[92px] text-left">{copied ? "Скопійовано" : "Копіювати"}</span>
-      </button>
+      </motion.button>
     </Stage>
   );
 }
@@ -862,7 +869,7 @@ function ToastStack({ reduced, card }: PreviewProps) {
   const expanded = hover || !!card;
   const spring = reduced ? { duration: 0.001 } : { type: "spring", stiffness: 380, damping: 30 };
   return (
-    <div className="flex h-full w-full flex-col items-center justify-end gap-4 p-6">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-4 p-6">
       {!card && (
         <button
           onClick={add}
@@ -912,8 +919,7 @@ function ToastStack({ reduced, card }: PreviewProps) {
 /* 26. Error state shake (transitions.dev) — per-segment shake + revert */
 function ErrorShake({ card }: PreviewProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [value, setValue] = useState("");
-  const auto = useAutoOpen(card, 500);
+  const auto = useAutoOpen(card, 600);
 
   const showError = () => {
     const wrap = wrapRef.current as
@@ -938,19 +944,6 @@ function ErrorShake({ card }: PreviewProps) {
     }, shakeMs + 3000);
   };
 
-  const clearError = () => {
-    const wrap = wrapRef.current as
-      | (HTMLDivElement & { _t?: ReturnType<typeof setTimeout> | null })
-      | null;
-    if (!wrap) return;
-    if (wrap._t) {
-      clearTimeout(wrap._t);
-      wrap._t = null;
-    }
-    wrap.classList.remove("is-error");
-    wrap.querySelector(".t-input")?.classList.remove("is-error");
-  };
-
   useEffect(() => {
     if (card && auto) showError();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -958,29 +951,19 @@ function ErrorShake({ card }: PreviewProps) {
 
   return (
     <Stage>
-      <div ref={wrapRef} className="t-input-wrap flex w-full max-w-[260px] flex-col gap-2">
-        <div className="t-input flex items-center gap-1 rounded-[10px] border bg-surface p-1">
-          <input
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
-              clearError();
-            }}
-            placeholder="email@example.com"
-            aria-label="Email"
-            className="min-w-0 flex-1 bg-transparent px-2 py-1 text-sm outline-none"
-          />
-          <button
-            type="button"
-            onClick={() => {
-              if (!/\S+@\S+\.\S+/.test(value)) showError();
-            }}
-            className="shrink-0 rounded-[7px] border border-border bg-surface-2 px-3 py-1 text-xs"
-          >
-            Перевірити
-          </button>
+      <div ref={wrapRef} className="t-input-wrap flex w-full max-w-[260px] flex-col items-center gap-3">
+        {/* Display-only field (no typing) — the demo plays via the button. */}
+        <div className="t-input w-full select-none rounded-[10px] border bg-surface px-3.5 py-2.5 text-sm text-fg">
+          John
         </div>
-        <p className="t-error-msg text-xs">Введіть коректний email.</p>
+        <p className="t-error-msg self-start text-xs">Введіть коректне значення.</p>
+        <button
+          type="button"
+          onClick={showError}
+          className="mt-1 rounded-full border border-border bg-surface-2 px-5 py-2 text-sm font-medium shadow-sm transition-colors hover:text-fg"
+        >
+          Анімувати
+        </button>
       </div>
     </Stage>
   );

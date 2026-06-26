@@ -42,6 +42,8 @@ export interface DevHandoff {
 export interface Animation {
   slug: string;
   name: string;
+  /** Short one-line subtitle shown on the catalog card (motion.dev style). */
+  tagline?: string;
   category: Category;
   /** Interactive demos (button, input, toggle…) play right in the card preview.
    *  Non-interactive ones get a centered "view animation" button instead. */

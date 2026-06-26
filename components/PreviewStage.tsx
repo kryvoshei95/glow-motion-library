@@ -32,7 +32,7 @@ export function PreviewStage({ component }: { component: string }) {
 // `pointer-events-none` so clicks fall through to the card's modal overlay;
 // the in-card demo controls re-enable pointer events via `.demo-interactive`.
 const STAGE =
-  "allow-motion pointer-events-none relative h-44 overflow-hidden border-b-[1.5px] border-border bg-bg";
+  "allow-motion pointer-events-none relative h-44 overflow-hidden rounded-xl bg-bg";
 
 /** Catalog card preview (transitions.dev style).
  *  - Interactive demos render live so you can use them right in the card.
@@ -75,7 +75,7 @@ export function CardPreview({
         }}
         aria-label="Переглянути анімацію"
         title="Переглянути анімацію"
-        className="pointer-events-auto absolute right-2 top-2 z-10 grid h-7 w-7 place-items-center border border-border bg-surface/80 text-muted opacity-70 backdrop-blur-sm transition hover:text-fg hover:opacity-100 focus-visible:opacity-100"
+        className="pointer-events-auto absolute right-2 top-2 z-10 grid h-7 w-7 place-items-center rounded-full border border-border bg-surface/80 text-muted opacity-70 backdrop-blur-sm transition hover:text-fg hover:opacity-100 focus-visible:opacity-100"
       >
         <PlayIcon size={12} />
       </button>

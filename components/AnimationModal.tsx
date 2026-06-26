@@ -56,12 +56,12 @@ export function AnimationModal({
             // transitions.dev modal: smooth ease-out, 250ms open / 150ms close
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="relative my-auto w-full max-w-3xl rounded-none border border-border bg-bg p-5 shadow-2xl outline-none sm:p-7"
+            className="relative my-auto w-full max-w-3xl rounded-2xl border border-border bg-bg p-5 shadow-2xl outline-none sm:p-7"
           >
             <button
               onClick={onClose}
               aria-label="Закрити"
-              className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-none border border-border bg-surface text-muted transition-colors hover:bg-surface-2 hover:text-fg"
+              className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full border border-border bg-surface text-muted transition-colors hover:bg-surface-2 hover:text-fg"
             >
               <CloseIcon size={16} />
             </button>

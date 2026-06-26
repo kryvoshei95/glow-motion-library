@@ -2,6 +2,7 @@
   {
     "slug": "toast-stack",
     "name": "Toast Stack",
+    "tagline": "Стопка тостів зі зсувом вглиб",
     "category": "alert",
     "interactive": true,
     "useCase": "Стопка сповіщень: нові тости складаються вглиб (scale + зсув), при наведенні розкриваються списком.",
@@ -38,6 +39,7 @@
   {
     "slug": "error-state-shake",
     "name": "Error State Shake",
+    "tagline": "Cubic-bezier трясіння при помилці",
     "category": "alert",
     "interactive": true,
     "useCase": "Валідація форми: інпут трясеться вліво-вправо з овершутом, рамка червоніє, знизу з'являється повідомлення.",
@@ -73,6 +75,7 @@
   {
     "slug": "copy-button",
     "name": "Copy Button",
+    "tagline": "Свап іконки з баунсом і зміною кольору",
     "category": "buttons",
     "interactive": true,
     "useCase": "Кнопка копіювання: іконка copy змінюється на галочку з blur-переходом і draw — підтвердження дії.",
@@ -109,6 +112,7 @@
   {
     "slug": "base-checkbox",
     "name": "Checkbox",
+    "tagline": "Прочерк галочки з баунсом",
     "category": "checkbox",
     "interactive": true,
     "useCase": "Чекбокс: галочка домальовується (path-draw) з легким баунсом боксу; при знятті — прочерчується назад.",
@@ -145,6 +149,7 @@
   {
     "slug": "base-radio",
     "name": "Radio",
+    "tagline": "Пружинна точка вибору",
     "category": "radio",
     "interactive": true,
     "useCase": "Радіо-група: точка обраного варіанта з'являється/зникає пружинним масштабуванням із легким баунсом.",
@@ -180,6 +185,7 @@
   {
     "slug": "base-switch",
     "name": "Switch",
+    "tagline": "Пружинний повзунок",
     "category": "toggle",
     "interactive": true,
     "useCase": "Перемикач: повзунок пружинно переїжджає з легким баунсом, трек змінює колір — увімк/вимк налаштування.",

@@ -50,11 +50,19 @@ export function ReplayIcon({ className, size }: IconProps) {
   );
 }
 
-// Motion-style striped mark (three slanted bars)
+// Brand mark — inherits currentColor so it follows the monochrome theme.
 export function LogoMark({ className, size = 22 }: IconProps) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" className={className} aria-hidden fill="currentColor">
-      <path d="M3 18 9 6h3l-6 12H3zM9 18 15 6h3l-6 12H9zM15 18 21 6h-3l-6 12h3z" />
+    <svg
+      width={(size * 16) / 20}
+      height={size}
+      viewBox="0 0 16 20"
+      fill="currentColor"
+      className={className}
+      aria-hidden
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M11.3136 0.094556L10.0777 2.17401C9.31719 1.89047 8.55656 1.70149 7.70091 1.70149C4.1832 1.70149 1.42611 4.34802 1.42611 7.75087C1.42611 9.7359 2.37677 11.5318 3.89803 12.5715L0 19.0937H14.1659V15.7854H5.70433L6.94029 13.7058C7.22559 13.7058 7.41574 13.7058 7.70091 13.7058C11.2186 13.7058 13.9757 11.0592 13.9757 7.65644C13.9757 6.23849 13.5004 4.91523 12.6447 3.96993L15.0215 0H11.3136V0.094556ZM7.70091 10.4921C6.17978 10.4921 4.94383 9.26325 4.94383 7.75087C4.94383 6.2385 6.17978 5.00978 7.70091 5.00978C9.22204 5.00978 10.458 6.2385 10.458 7.75087C10.458 9.26325 9.31718 10.4921 7.70091 10.4921Z" />
     </svg>
   );
 }

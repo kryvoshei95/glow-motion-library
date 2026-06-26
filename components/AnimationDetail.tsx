@@ -73,6 +73,23 @@ export function AnimationDetail({
           <CopyButton text={JSON.stringify(anim, null, 2)} label="Copy JSON" />
         </div>
         <p className="max-w-2xl text-muted">{anim.useCase}</p>
+        {anim.referenceUrl && (
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <a
+              href={anim.referenceUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="caps text-accent underline-offset-2 hover:underline"
+            >
+              ↗ Motion.dev reference
+            </a>
+            {anim.matchStatus && (
+              <span className="inline-flex w-fit items-center border border-border bg-surface-2 px-2 py-0.5 text-[11px] text-muted">
+                {anim.matchStatus}
+              </span>
+            )}
+          </div>
+        )}
       </header>
 
       {/* Most-used handoff facts as a hairline-separated stat grid */}

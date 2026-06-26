@@ -706,7 +706,11 @@ function BaseCheckbox({ reduced, card }: PreviewProps) {
   );
 }
 
-/* 22. Copy Button — icon swap + blur + path-draw (motion.dev/examples/react-copy-button) */
+/* 22. Copy Button — icon swap + blur + path-draw (motion.dev/examples/react-copy-button)
+   Reconstructed from the public Motion.dev live preview (examples.motion.dev/react/copy-button)
+   via Playwright DOM/computed-style/frame analysis. Original Motion+ source values not available.
+   Measured: button bg rgb(15,24,21), border 1px rgb(28,38,35), radius 10px, padding 10/16,
+   Inter 14/500, white. Copied state → green check + "Copied!", green text/border. */
 function CopyButtonAnim({ reduced, card }: PreviewProps) {
   const [copiedState, setCopied] = useState(false);
   const auto = useAutoOpen(card, 500);
@@ -716,27 +720,28 @@ function CopyButtonAnim({ reduced, card }: PreviewProps) {
     setTimeout(() => setCopied(false), 1800);
   };
   const blur = reduced ? "blur(0px)" : "blur(4px)";
-  // Very light bounce on the icon swap; the button width resizes to fit the
-  // label via a layout animation with a light-bounce spring.
-  const bounce = reduced
-    ? { duration: 0 }
-    : { type: "spring" as const, visualDuration: 0.32, bounce: 0.3 };
+  const GREEN = "rgb(74, 222, 128)";
+  const bounce = reduced ? { duration: 0 } : { type: "spring" as const, visualDuration: 0.32, bounce: 0.3 };
   return (
-    <Stage>
+    <div
+      className="flex h-full w-full items-center justify-center"
+      style={{ background: "rgb(11, 16, 18)", fontFamily: "Inter, sans-serif" }}
+    >
       <motion.button
         layout
         onClick={fire}
         animate={{
-          backgroundColor: copied ? "var(--accent)" : "var(--surface)",
-          color: copied ? "var(--accent-fg)" : "var(--fg)",
-          borderColor: copied ? "var(--accent)" : "var(--border)",
+          backgroundColor: copied ? "rgb(13, 26, 19)" : "rgb(15, 24, 21)",
+          color: copied ? GREEN : "rgb(255, 255, 255)",
+          borderColor: copied ? "rgba(74, 222, 128, 0.45)" : "rgb(28, 38, 35)",
         }}
         transition={{
           layout: reduced ? { duration: 0.001 } : { type: "spring", visualDuration: 0.3, bounce: 0.18 },
           duration: reduced ? 0 : 0.22,
           ease: [0.22, 1, 0.36, 1],
         }}
-        className="inline-flex items-center gap-2 whitespace-nowrap rounded-[10px] border px-3.5 py-2 text-sm font-medium shadow-sm"
+        style={{ borderWidth: 1, borderStyle: "solid", borderRadius: 10, padding: "10px 16px", fontSize: 14, fontWeight: 500 }}
+        className="inline-flex items-center gap-2 whitespace-nowrap"
       >
         <span className="relative grid h-[18px] w-[18px] shrink-0 place-items-center">
           <AnimatePresence mode="popLayout" initial={false}>
@@ -785,9 +790,9 @@ function CopyButtonAnim({ reduced, card }: PreviewProps) {
             )}
           </AnimatePresence>
         </span>
-        <motion.span layout className="text-left">{copied ? "Скопійовано" : "Копіювати"}</motion.span>
+        <motion.span layout className="text-left">{copied ? "Copied!" : "Copy"}</motion.span>
       </motion.button>
-    </Stage>
+    </div>
   );
 }
 
@@ -857,63 +862,92 @@ function BaseRadio({ reduced, card }: PreviewProps) {
   );
 }
 
-/* 25. Toast Stack — push-back stack + AnimatePresence (motion.dev/examples/react-toast-stack) */
+/* 25. Toast Stack — push-back stack + AnimatePresence (motion.dev/examples/react-toast-stack)
+   Reconstructed from the public Motion.dev live preview (examples.motion.dev/react/toast-stack)
+   via Playwright DOM/computed-style/frame analysis. Original Motion+ source values not available.
+   Measured: toast bg rgb(15,24,21), border 1px rgb(28,38,35), radius 14px,
+   shadow rgba(0,0,0,.25) 0 8px 32px, padding 14/16, width 386; stack steps per depth:
+   scale −0.06, translateY −10px, opacity −0.2 (front→back); no hover-expand. */
 function ToastStack({ reduced, card }: PreviewProps) {
   const [toasts, setToasts] = useState<number[]>([]);
-  const [hover, setHover] = useState(false);
   const nextId = useRef(1);
   const add = () => {
     const id = nextId.current++;
     setToasts((prev) => [id, ...prev].slice(0, 3));
-    setTimeout(() => setToasts((prev) => prev.filter((x) => x !== id)), 4500);
+    setTimeout(() => setToasts((prev) => prev.filter((x) => x !== id)), 4000);
   };
   useEffect(() => {
     if (!card) return;
-    const ids = [setTimeout(add, 250), setTimeout(add, 650), setTimeout(add, 1050)];
+    const ids = [setTimeout(add, 300), setTimeout(add, 850), setTimeout(add, 1400)];
     return () => ids.forEach(clearTimeout);
   }, [card]);
-  const expanded = hover || !!card;
-  const spring = reduced ? { duration: 0.001 } : { type: "spring", stiffness: 380, damping: 30 };
+  // Reconstructed spring — settle character matched to the live preview (no overshoot).
+  const spring = reduced ? { duration: 0.001 } : { type: "spring" as const, stiffness: 420, damping: 34 };
+
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-4 p-6">
+    <div
+      className="relative flex h-full w-full items-center justify-center overflow-hidden"
+      style={{ background: "rgb(11, 16, 18)", fontFamily: "Inter, sans-serif" }}
+    >
       {!card && (
         <button
           onClick={add}
-          className="rounded-[10px] border border-border bg-surface px-4 py-2 text-sm shadow-sm transition-colors hover:bg-surface-2"
+          style={{
+            background: "rgb(15, 24, 21)",
+            border: "1px solid rgb(28, 38, 35)",
+            borderRadius: 10,
+            padding: "10px 20px",
+            color: "#fff",
+            fontSize: 14,
+            fontWeight: 500,
+          }}
         >
-          Надіслати сповіщення
+          Add toast
         </button>
       )}
       <div
-        className="relative h-28 w-full max-w-[260px]"
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
+        className="absolute bottom-5 left-1/2 -translate-x-1/2"
+        style={{ width: "min(386px, 92%)", height: 70 }}
       >
         <AnimatePresence>
           {toasts.map((id, i) => (
             <motion.div
               key={id}
-              layout
-              initial={{ opacity: 0, y: 24, scale: 0.92 }}
-              animate={{
-                opacity: expanded ? 1 : Math.max(0, 1 - i * 0.32),
-                y: expanded ? i * -52 : i * -8,
-                scale: expanded ? 1 : 1 - i * 0.05,
-              }}
-              exit={{ opacity: 0, y: 24, scale: 0.92 }}
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              animate={{ opacity: 1 - i * 0.2, y: i * -10, scale: 1 - i * 0.06 }}
+              exit={{ opacity: 0, y: 14, scale: 0.9 }}
               transition={spring}
-              style={{ zIndex: toasts.length - i }}
-              className="absolute inset-x-0 bottom-0 flex items-center gap-3 rounded-xl border border-border bg-surface px-3.5 py-3 shadow-lg"
+              style={{
+                zIndex: 10 - i,
+                background: "rgb(15, 24, 21)",
+                border: "1px solid rgb(28, 38, 35)",
+                borderRadius: 14,
+                boxShadow: "rgba(0, 0, 0, 0.25) 0px 8px 32px 0px",
+                padding: "14px 16px",
+              }}
+              className="absolute inset-x-0 bottom-0 flex items-center gap-3"
             >
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-fg text-bg">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
+              <span className="shrink-0 text-[18px] leading-none" style={{ color: "#fbbf24" }}>
+                ★
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-fg">Збережено</p>
-                <p className="truncate text-xs text-muted">Зміни застосовано · #{id}</p>
+                <p className="text-[14px] font-semibold leading-tight" style={{ color: "rgb(237, 237, 236)" }}>
+                  Achievement unlocked
+                </p>
+                <p className="truncate text-[13px] leading-tight" style={{ color: "rgb(150, 160, 158)" }}>
+                  You shipped 10 features this week!
+                </p>
               </div>
+              <button
+                onClick={() => setToasts((prev) => prev.filter((x) => x !== id))}
+                className="shrink-0"
+                style={{ color: "rgb(150, 160, 158)" }}
+                aria-label="Dismiss"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
             </motion.div>
           ))}
         </AnimatePresence>

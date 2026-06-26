@@ -34,7 +34,9 @@
       "dont": ["Не показувати критичні помилки тостом, що зникає сам."]
     },
     "tags": ["toast", "stack", "notification", "spring"],
-    "preview": { "component": "ToastStack" }
+    "preview": { "component": "ToastStack" },
+    "referenceUrl": "https://motion.dev/examples/react-toast-stack",
+    "matchStatus": "Pixel/motion matched from public live reference"
   },
   {
     "slug": "error-state-shake",
@@ -107,7 +109,9 @@
       "dont": ["Не змінювати ширину кнопки при зміні підпису — зарезервувати місце."]
     },
     "tags": ["copy", "button", "icon-swap", "feedback"],
-    "preview": { "component": "CopyButtonAnim" }
+    "preview": { "component": "CopyButtonAnim" },
+    "referenceUrl": "https://motion.dev/examples/react-copy-button",
+    "matchStatus": "Pixel/motion matched from public live reference"
   },
   {
     "slug": "base-checkbox",

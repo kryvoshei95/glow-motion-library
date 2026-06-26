@@ -61,6 +61,13 @@ export interface Animation {
   guidelines: { do: string[]; dont: string[] };
   tags: string[];
   preview: { component: string };
+  /** Motion.dev reference this preview is matched against. */
+  referenceUrl?: string;
+  /** Honest fidelity status — never "Source-identical" unless real source was available. */
+  matchStatus?:
+    | "Pixel/motion matched from public live reference"
+    | "Public tutorial partial match"
+    | "Needs Motion+ source for source-identical values";
 }
 
 // Display order + UA labels for the sidebar.

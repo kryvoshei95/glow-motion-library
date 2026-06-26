@@ -716,23 +716,29 @@ function CopyButtonAnim({ reduced, card }: PreviewProps) {
     setTimeout(() => setCopied(false), 1800);
   };
   const blur = reduced ? "blur(0px)" : "blur(4px)";
-  // Bouncy spring on the icon swap; the button also changes colour (fills) on copy.
+  // Very light bounce on the icon swap; the button width resizes to fit the
+  // label via a layout animation with a light-bounce spring.
   const bounce = reduced
     ? { duration: 0 }
-    : { type: "spring" as const, visualDuration: 0.4, bounce: 0.55 };
+    : { type: "spring" as const, visualDuration: 0.32, bounce: 0.3 };
   return (
     <Stage>
       <motion.button
+        layout
         onClick={fire}
         animate={{
           backgroundColor: copied ? "var(--accent)" : "var(--surface)",
           color: copied ? "var(--accent-fg)" : "var(--fg)",
           borderColor: copied ? "var(--accent)" : "var(--border)",
         }}
-        transition={{ duration: reduced ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
-        className="flex items-center gap-2 rounded-[10px] border px-3.5 py-2 text-sm font-medium shadow-sm"
+        transition={{
+          layout: reduced ? { duration: 0.001 } : { type: "spring", visualDuration: 0.3, bounce: 0.18 },
+          duration: reduced ? 0 : 0.22,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+        className="inline-flex items-center gap-2 whitespace-nowrap rounded-[10px] border px-3.5 py-2 text-sm font-medium shadow-sm"
       >
-        <span className="relative grid h-[18px] w-[18px] place-items-center">
+        <span className="relative grid h-[18px] w-[18px] shrink-0 place-items-center">
           <AnimatePresence mode="popLayout" initial={false}>
             {copied ? (
               <motion.svg
@@ -779,7 +785,7 @@ function CopyButtonAnim({ reduced, card }: PreviewProps) {
             )}
           </AnimatePresence>
         </span>
-        <span className="w-[92px] text-left">{copied ? "Скопійовано" : "Копіювати"}</span>
+        <motion.span layout className="text-left">{copied ? "Скопійовано" : "Копіювати"}</motion.span>
       </motion.button>
     </Stage>
   );
@@ -969,6 +975,170 @@ function ErrorShake({ card }: PreviewProps) {
   );
 }
 
+/* 27. Number price switcher (motion.dev) — segmented toggle + rolling number */
+function NumberPriceSwitcher({ reduced, card }: PreviewProps) {
+  const [yearlyState, setYearly] = useState(false);
+  const auto = useAutoOpen(card, 600);
+  const yearly = card ? auto : yearlyState;
+  const price = yearly ? 120 : 12;
+  const [display, setDisplay] = useState(price);
+  useEffect(() => {
+    if (reduced) {
+      setDisplay(price);
+      return;
+    }
+    const controls = animate(display, price, {
+      duration: 0.5,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (v) => setDisplay(v),
+    });
+    return () => controls.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [yearly, reduced]);
+  return (
+    <Stage>
+      <div className="flex flex-col items-center gap-4">
+        <div className="flex items-end gap-1">
+          <span className="mb-1 text-2xl font-medium text-muted">$</span>
+          <span className="tabular text-5xl font-semibold tracking-tight">{Math.round(display)}</span>
+          <span className="mb-1.5 text-sm text-muted">/{yearly ? "рік" : "міс"}</span>
+        </div>
+        <div className="flex rounded-full border border-border bg-surface-2 p-0.5 text-xs">
+          {[
+            { k: false, l: "Місяць" },
+            { k: true, l: "Рік" },
+          ].map((o) => (
+            <button
+              key={String(o.k)}
+              onClick={() => setYearly(o.k)}
+              className={`rounded-full px-3 py-1 transition-colors ${
+                yearly === o.k ? "bg-surface text-fg shadow-sm" : "text-muted"
+              }`}
+            >
+              {o.l}
+            </button>
+          ))}
+        </div>
+      </div>
+    </Stage>
+  );
+}
+
+/* 28. Context menu (motion.dev / Base UI) — right-click, scale+fade from origin */
+function ContextMenu({ reduced, card }: PreviewProps) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const auto = useAutoOpen(card, 500);
+  useEffect(() => {
+    if (card && auto) {
+      setPos({ x: 64, y: 44 });
+      setOpen(true);
+    }
+  }, [card, auto]);
+  const items = ["Копіювати", "Перейменувати", "Дублювати", "Видалити"];
+  return (
+    <Stage>
+      <div
+        onContextMenu={(e) => {
+          e.preventDefault();
+          const r = e.currentTarget.getBoundingClientRect();
+          setPos({ x: e.clientX - r.left, y: e.clientY - r.top });
+          setOpen(true);
+        }}
+        onClick={() => setOpen(false)}
+        className="pointer-events-auto relative grid h-full w-full place-items-center rounded-xl border border-dashed border-border text-xs text-muted"
+      >
+        Натисни правою кнопкою
+        <AnimatePresence>
+          {open && (
+            <motion.ul
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={reduced ? { duration: 0.001 } : { type: "spring", visualDuration: 0.22, bounce: 0.2 }}
+              style={{ left: pos.x, top: pos.y, transformOrigin: "top left" }}
+              className="absolute z-10 w-40 overflow-hidden rounded-xl border border-border bg-surface py-1 text-sm text-fg shadow-lg"
+            >
+              {items.map((it) => (
+                <li key={it}>
+                  <button
+                    className={`block w-full px-3 py-1.5 text-left transition-colors hover:bg-surface-2 ${
+                      it === "Видалити" ? "text-[color:var(--error)]" : ""
+                    }`}
+                  >
+                    {it}
+                  </button>
+                </li>
+              ))}
+            </motion.ul>
+          )}
+        </AnimatePresence>
+      </div>
+    </Stage>
+  );
+}
+
+/* 29. Multi-state badge (motion.dev) — layout width resize + content/colour swap */
+function MultiStateBadge({ reduced, card }: PreviewProps) {
+  const [state, setState] = useState<"idle" | "loading" | "done">("idle");
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const auto = useAutoOpen(card, 600);
+  const run = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    setState("loading");
+    timers.current.push(setTimeout(() => setState("done"), 1400));
+    timers.current.push(setTimeout(() => setState("idle"), 3000));
+  };
+  useEffect(() => {
+    if (card && auto) run();
+    return () => timers.current.forEach(clearTimeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [card, auto]);
+  const cfg = {
+    idle: { label: "Почати", bg: "var(--surface)", fg: "var(--fg)" },
+    loading: { label: "Обробка…", bg: "var(--surface-2)", fg: "var(--muted)" },
+    done: { label: "Готово", bg: "var(--accent)", fg: "var(--accent-fg)" },
+  }[state];
+  return (
+    <Stage>
+      <motion.button
+        layout
+        onClick={() => state === "idle" && run()}
+        animate={{ backgroundColor: cfg.bg, color: cfg.fg }}
+        transition={{
+          layout: reduced ? { duration: 0.001 } : { type: "spring", visualDuration: 0.3, bounce: 0.25 },
+          duration: reduced ? 0 : 0.25,
+        }}
+        className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-medium shadow-sm"
+      >
+        {state === "loading" && (
+          <span className="h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        )}
+        {state === "done" && (
+          <motion.svg
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={reduced ? { duration: 0 } : { type: "spring", visualDuration: 0.3, bounce: 0.5 }}
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="shrink-0"
+          >
+            <path d="M20 6 9 17l-5-5" />
+          </motion.svg>
+        )}
+        <motion.span layout>{cfg.label}</motion.span>
+      </motion.button>
+    </Stage>
+  );
+}
+
 export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   FadeInUp,
   StaggerListReveal,
@@ -996,6 +1166,9 @@ export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   BaseRadio,
   ToastStack,
   ErrorShake,
+  NumberPriceSwitcher,
+  ContextMenu,
+  MultiStateBadge,
 };
 
 export function getPreview(name: string) {

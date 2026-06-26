@@ -217,5 +217,112 @@
     },
     "tags": ["switch", "toggle", "input", "spring"],
     "preview": { "component": "BaseSwitch" }
+  },
+  {
+    "slug": "context-menu",
+    "name": "Context Menu",
+    "tagline": "Контекстне меню по ПКМ",
+    "category": "dropdown",
+    "interactive": true,
+    "useCase": "Контекстне меню по правому кліку: відкривається масштабуванням від точки кліку (origin) + fade.",
+    "trigger": "click/tap",
+    "duration": { "value": 200, "token": "base", "unit": "ms" },
+    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
+    "motionProperties": [
+      { "property": "opacity", "from": 0, "to": 1 },
+      { "property": "scale", "from": 0.95, "to": 1 }
+    ],
+    "complexity": "medium",
+    "platform": "web",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — показувати меню без масштабування; тримати клавіатурну навігацію, закриття по Esc та кліку поза."
+    },
+    "devHandoff": {
+      "note": "motion.dev / Base UI context menu: transform-origin у точці кліку, scale 0.95→1 + fade, легка пружина; закриття по кліку поза та Esc.",
+      "css": ".ctx-menu{transform-origin:var(--origin);opacity:0;transform:scale(0.95);transition:opacity 200ms var(--motion-ease-smooth),transform 200ms var(--motion-ease-smooth)}\n.ctx-menu[data-open]{opacity:1;transform:scale(1)}",
+      "tailwind": "origin-[var(--origin)] transition-[opacity,transform] duration-200 data-[open]:scale-100 data-[open]:opacity-100 scale-95 opacity-0",
+      "framerMotion": { "initial": { "opacity": 0, "scale": 0.95 }, "animate": { "opacity": 1, "scale": 1 }, "exit": { "opacity": 0, "scale": 0.95 }, "style": { "transformOrigin": "top left" }, "transition": { "type": "spring", "visualDuration": 0.22, "bounce": 0.2 } },
+      "gsap": "gsap.fromTo(menu,{autoAlpha:0,scale:0.95},{autoAlpha:1,scale:1,duration:0.2,transformOrigin:'top left',ease:'power2.out'})",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Ставити transform-origin у точку кліку.", "Закривати по Esc і кліку поза меню."],
+      "dont": ["Не блокувати нативне меню без альтернативи для клавіатури."]
+    },
+    "tags": ["context", "menu", "dropdown", "right-click"],
+    "preview": { "component": "ContextMenu" }
+  },
+  {
+    "slug": "multi-state-badge",
+    "name": "Multi-state Badge",
+    "tagline": "Бейдж зі зміною станів",
+    "category": "buttons",
+    "interactive": true,
+    "useCase": "Бейдж-кнопка переходить між станами (Почати → Обробка → Готово): ширина плавно підлаштовується, контент і колір змінюються.",
+    "trigger": "click/tap",
+    "duration": { "value": 200, "token": "base", "unit": "ms" },
+    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
+    "motionProperties": [
+      { "property": "width (layout)", "from": "за станом", "to": "за станом" },
+      { "property": "background-color", "from": "surface", "to": "accent" }
+    ],
+    "complexity": "advanced",
+    "platform": "both",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — без пружинного ресайзу; стан озвучувати через aria-live, не лише кольором/іконкою."
+    },
+    "devHandoff": {
+      "note": "motion.dev multi-state badge: layout-анімація ширини при зміні підпису, AnimatePresence для іконки (спінер/галочка), зміна кольору за станом, легка пружина.",
+      "css": ".badge{display:inline-flex;align-items:center;gap:8px;border-radius:999px;transition:background-color 250ms var(--motion-ease-smooth),color 250ms var(--motion-ease-smooth)}",
+      "tailwind": "inline-flex items-center gap-2 rounded-full transition-colors duration-250",
+      "framerMotion": { "layout": true, "animate": { "backgroundColor": "var(--accent)", "color": "var(--accent-fg)" }, "transition": { "layout": { "type": "spring", "visualDuration": 0.3, "bounce": 0.25 }, "duration": 0.25 } },
+      "gsap": "gsap.to(badge,{width:'auto',backgroundColor:'#000',duration:0.3,ease:'back.out(1.4)'})",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Анімувати ширину через layout, а не фіксовану.", "Озвучувати стан через aria-live."],
+      "dont": ["Не передавати стан лише кольором — додавати іконку/текст."]
+    },
+    "tags": ["badge", "states", "button", "layout"],
+    "preview": { "component": "MultiStateBadge" }
+  },
+  {
+    "slug": "number-price-switcher",
+    "name": "Price Switcher",
+    "tagline": "Перемикач ціни з роликом цифр",
+    "category": "toggle",
+    "interactive": true,
+    "useCase": "Перемикач тарифу (місяць/рік): ціна перекочується між значеннями цифрами, тоггл-сегмент перемикає період.",
+    "trigger": "click/tap",
+    "duration": { "value": 500, "token": "slow", "unit": "ms" },
+    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
+    "motionProperties": [
+      { "property": "value (число)", "from": 12, "to": 120 }
+    ],
+    "complexity": "medium",
+    "platform": "both",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — показувати кінцеву ціну одразу; верстати tabular-nums, щоб ширина не стрибала."
+    },
+    "devHandoff": {
+      "note": "motion.dev number/price switcher: число анімується (AnimateNumber / animate motion value) між значеннями; сегмент-тоггл перемикає період. tabular-nums.",
+      "css": ".price{font-variant-numeric:tabular-nums}",
+      "tailwind": "[font-variant-numeric:tabular-nums]",
+      "framerMotion": { "note": "animate(mv, target, { duration: 0.5, ease: [0.22,1,0.36,1] }), render Math.round(mv); або AnimateNumber з motion." },
+      "gsap": "gsap.to(obj,{val:120,duration:0.5,ease:'power2.out',onUpdate:()=>el.textContent=Math.round(obj.val)})",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Вмикати tabular-nums, щоб число не смикало layout."],
+      "dont": ["Не анімувати надто довго — 0.4–0.6с достатньо."]
+    },
+    "tags": ["number", "price", "switcher", "toggle"],
+    "preview": { "component": "NumberPriceSwitcher" }
   }
 ]

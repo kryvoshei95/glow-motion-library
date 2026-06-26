@@ -48,7 +48,7 @@ export function AnimationCard({
           className="group/link pointer-events-auto relative z-10 grid h-8 w-8 shrink-0 place-items-center border border-border text-muted transition-colors hover:border-accent/50 hover:text-fg"
         >
           {copied ? <CheckIcon size={14} /> : <LinkIcon size={14} />}
-          <span className="pointer-events-none absolute bottom-full right-0 mb-1.5 origin-bottom-right scale-[0.98] whitespace-nowrap border border-border bg-bg px-2 py-1 text-xs text-fg opacity-0 shadow-md transition-[opacity,transform] duration-[50ms] ease-out group-hover/link:scale-100 group-hover/link:opacity-100 group-hover/link:delay-[80ms] group-hover/link:duration-150 group-focus-visible/link:scale-100 group-focus-visible/link:opacity-100 group-focus-visible/link:delay-[80ms] group-focus-visible/link:duration-150">
+          <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 origin-bottom -translate-x-1/2 scale-[0.98] whitespace-nowrap border border-border bg-bg px-2 py-1 text-xs text-fg opacity-0 shadow-md transition-[opacity,transform] duration-[50ms] ease-out group-hover/link:scale-100 group-hover/link:opacity-100 group-hover/link:delay-[80ms] group-hover/link:duration-150 group-focus-visible/link:scale-100 group-focus-visible/link:opacity-100 group-focus-visible/link:delay-[80ms] group-focus-visible/link:duration-150">
             {copied ? "Скопійовано" : "Скопіювати посилання"}
           </span>
         </button>

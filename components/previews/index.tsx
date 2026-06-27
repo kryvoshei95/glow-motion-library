@@ -725,15 +725,15 @@ function CopyButtonAnim({ reduced, card }: PreviewProps) {
   return (
     <div
       className="flex h-full w-full items-center justify-center"
-      style={{ background: "rgb(11, 16, 18)", fontFamily: "Inter, sans-serif" }}
+      style={{ background: "transparent", fontFamily: "Inter, sans-serif" }}
     >
       <motion.button
         layout
         onClick={fire}
         animate={{
-          backgroundColor: copied ? "rgb(13, 26, 19)" : "rgb(15, 24, 21)",
-          color: copied ? GREEN : "rgb(255, 255, 255)",
-          borderColor: copied ? "rgba(74, 222, 128, 0.45)" : "rgb(28, 38, 35)",
+          backgroundColor: copied ? "rgba(74, 222, 128, 0.12)" : "var(--surface)",
+          color: copied ? GREEN : "var(--fg)",
+          borderColor: copied ? "rgba(74, 222, 128, 0.45)" : "var(--border)",
         }}
         transition={{
           layout: reduced ? { duration: 0.001 } : { type: "spring", visualDuration: 0.3, bounce: 0.18 },
@@ -887,17 +887,17 @@ function ToastStack({ reduced, card }: PreviewProps) {
   return (
     <div
       className="relative flex h-full w-full items-center justify-center overflow-hidden"
-      style={{ background: "rgb(11, 16, 18)", fontFamily: "Inter, sans-serif" }}
+      style={{ background: "transparent", fontFamily: "Inter, sans-serif" }}
     >
       {!card && (
         <button
           onClick={add}
           style={{
-            background: "rgb(15, 24, 21)",
-            border: "1px solid rgb(28, 38, 35)",
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
             borderRadius: 10,
             padding: "10px 20px",
-            color: "#fff",
+            color: "var(--fg)",
             fontSize: 14,
             fontWeight: 500,
           }}
@@ -919,8 +919,8 @@ function ToastStack({ reduced, card }: PreviewProps) {
               transition={spring}
               style={{
                 zIndex: 10 - i,
-                background: "rgb(15, 24, 21)",
-                border: "1px solid rgb(28, 38, 35)",
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
                 borderRadius: 14,
                 boxShadow: "rgba(0, 0, 0, 0.25) 0px 8px 32px 0px",
                 padding: "14px 16px",
@@ -931,17 +931,17 @@ function ToastStack({ reduced, card }: PreviewProps) {
                 ★
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-[14px] font-semibold leading-tight" style={{ color: "rgb(237, 237, 236)" }}>
+                <p className="text-[14px] font-semibold leading-tight" style={{ color: "var(--fg)" }}>
                   Achievement unlocked
                 </p>
-                <p className="truncate text-[13px] leading-tight" style={{ color: "rgb(150, 160, 158)" }}>
+                <p className="truncate text-[13px] leading-tight" style={{ color: "var(--muted)" }}>
                   You shipped 10 features this week!
                 </p>
               </div>
               <button
                 onClick={() => setToasts((prev) => prev.filter((x) => x !== id))}
                 className="shrink-0"
-                style={{ color: "rgb(150, 160, 158)" }}
+                style={{ color: "var(--muted)" }}
                 aria-label="Dismiss"
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -1076,13 +1076,13 @@ function ContextMenu({ reduced, card }: PreviewProps) {
     }
   }, [card, auto]);
 
-  const ROW = "flex items-center justify-between gap-6 rounded-[4px] px-3 py-1.5 text-[14px] text-white transition-colors hover:bg-white/[0.07]";
-  const KBD = { color: "rgb(150,160,158)", fontSize: 12 } as const;
+  const ROW = "flex items-center justify-between gap-6 rounded-[4px] px-3 py-1.5 text-[14px] text-fg transition-colors hover:bg-surface-2";
+  const KBD = { color: "var(--muted)", fontSize: 12 } as const;
 
   return (
     <div
       className="relative h-full w-full"
-      style={{ background: "rgb(11, 16, 18)", fontFamily: "Inter, sans-serif" }}
+      style={{ background: "transparent", fontFamily: "Inter, sans-serif" }}
       onClick={() => setOpen(false)}
     >
       <div
@@ -1093,7 +1093,7 @@ function ContextMenu({ reduced, card }: PreviewProps) {
           setOpen(true);
         }}
         className="absolute inset-6 grid place-items-center rounded-[8px] text-[14px]"
-        style={{ border: "1px solid rgb(30,36,39)", color: "rgb(237,237,236)" }}
+        style={{ border: "1px solid var(--border)", color: "var(--fg)" }}
       >
         Right-click here
         <AnimatePresence>
@@ -1108,8 +1108,8 @@ function ContextMenu({ reduced, card }: PreviewProps) {
                 top: pos.y,
                 transformOrigin: "top left",
                 width: 207,
-                background: "rgba(17, 22, 24, 0.8)",
-                border: "1px solid rgb(30, 36, 39)",
+                background: "color-mix(in srgb, var(--surface) 88%, transparent)",
+                border: "1px solid var(--border)",
                 borderRadius: 6,
                 padding: 4,
                 backdropFilter: "blur(10px)",
@@ -1122,8 +1122,8 @@ function ContextMenu({ reduced, card }: PreviewProps) {
               <div className={ROW}><span>Back</span><span style={KBD}>⌘+[</span></div>
               <div className={ROW}><span>Forward</span><span style={KBD}>⌘+]</span></div>
               <div className={ROW}><span>Reload</span><span style={KBD}>⌘+R</span></div>
-              <div className={ROW}><span>More Tools</span><span style={{ color: "rgb(150,160,158)" }}>›</span></div>
-              <div style={{ height: 1, background: "rgb(30,36,39)", margin: "4px 0" }} />
+              <div className={ROW}><span>More Tools</span><span style={{ color: "var(--muted)" }}>›</span></div>
+              <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
               <div className={ROW}>
                 <span className="flex items-center gap-2">
                   <span style={{ color: "#ec4899", width: 14 }}>✓</span>
@@ -1169,13 +1169,13 @@ function MultiStateBadge({ reduced, card }: PreviewProps) {
   return (
     <div
       className="flex h-full w-full items-center justify-center"
-      style={{ background: "rgb(11, 16, 18)", fontFamily: "Inter, sans-serif" }}
+      style={{ background: "transparent", fontFamily: "Inter, sans-serif" }}
     >
       <motion.button
         layout
         onClick={advance}
         transition={{ layout: layoutSpring }}
-        style={{ background: "#fff", color: "rgb(11, 16, 18)", borderRadius: 999, padding: "12px 20px", fontSize: 16, lineHeight: 1 }}
+        style={{ background: "var(--fg)", color: "var(--bg)", borderRadius: 999, padding: "12px 20px", fontSize: 16, lineHeight: 1 }}
         className="inline-flex items-center overflow-hidden"
       >
         <AnimatePresence mode="popLayout" initial={false}>
@@ -1229,10 +1229,10 @@ function TabSelect({ reduced, card }: PreviewProps) {
   // Reconstructed spring — indicator travel matched to the live preview.
   const spring = reduced ? { duration: 0.001 } : { type: "spring" as const, stiffness: 500, damping: 35 };
   return (
-    <div className="flex h-full w-full items-center justify-center" style={{ background: "rgb(11, 16, 18)", fontFamily: "Inter, sans-serif" }}>
+    <div className="flex h-full w-full items-center justify-center" style={{ background: "transparent", fontFamily: "Inter, sans-serif" }}>
       <ul
         className="inline-flex list-none items-center"
-        style={{ background: "rgb(15, 24, 21)", border: "1px solid rgb(28, 38, 35)", borderRadius: 10, padding: 5, gap: 5 }}
+        style={{ background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 10, padding: 5, gap: 5 }}
       >
         {tabs.map((tab, i) => (
           <li key={tab} className="relative">
@@ -1240,7 +1240,7 @@ function TabSelect({ reduced, card }: PreviewProps) {
               onClick={() => setSel(i)}
               whileTap={{ scale: reduced ? 1 : 0.95 }}
               className="relative flex h-10 items-center px-4 text-[16px]"
-              style={{ color: "#fff" }}
+              style={{ color: sel === i ? "#fff" : "var(--fg)" }}
             >
               {sel === i && (
                 <motion.span

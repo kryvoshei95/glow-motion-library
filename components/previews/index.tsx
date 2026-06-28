@@ -1365,6 +1365,197 @@ function SmoothTabs({ reduced, card }: PreviewProps) {
   );
 }
 
+/* Context Menu (custom, submenu + safe-zone cone) — motion.dev/examples/react-context-menu
+   Reconstructed from the public live preview (examples.motion.dev/react/context-menu) via
+   Playwright DOM/computed-style/screenshot measurement. Original Motion+ source not available.
+   Measured: panel blur(24px) saturate(1.5) radius 8 border rgba(255,255,255,.08); items 14px;
+   Undo/Redo(disabled)/Cut/Copy/Paste/Duplicate/Arrange›/Transform›/Visualise Safe Cone/Delete(red);
+   Arrange: Bring to Front ⌘] / Bring Forward ⌘⇧] / Send to Back ⌘[ / Send Backward ⌘⇧[;
+   Transform: Flip Horizontal/Vertical, Rotate 90°/180°. Surfaces theme-aware.
+   Safe-cone: moving diagonally toward an open submenu keeps it open (grace timer + triangle). */
+type CmEntry =
+  | { t: "item"; label: string; kbd?: string; disabled?: boolean; danger?: boolean }
+  | { t: "sep" }
+  | { t: "toggle"; label: string }
+  | { t: "sub"; label: string; items: ({ label: string; kbd?: string } | { sep: true })[] };
+
+const CM_MENU: CmEntry[] = [
+  { t: "item", label: "Undo", kbd: "⌘Z" },
+  { t: "item", label: "Redo", kbd: "⇧⌘Z", disabled: true },
+  { t: "sep" },
+  { t: "item", label: "Cut", kbd: "⌘X" },
+  { t: "item", label: "Copy", kbd: "⌘C" },
+  { t: "item", label: "Paste", kbd: "⌘V" },
+  { t: "item", label: "Duplicate", kbd: "⌘D" },
+  { t: "sep" },
+  { t: "sub", label: "Arrange", items: [
+    { label: "Bring to Front", kbd: "⌘]" },
+    { label: "Bring Forward", kbd: "⌘⇧]" },
+    { sep: true },
+    { label: "Send to Back", kbd: "⌘[" },
+    { label: "Send Backward", kbd: "⌘⇧[" },
+  ] },
+  { t: "sub", label: "Transform", items: [
+    { label: "Flip Horizontal" },
+    { label: "Flip Vertical" },
+    { label: "Rotate 90°" },
+    { label: "Rotate 180°" },
+  ] },
+  { t: "sep" },
+  { t: "toggle", label: "Visualise Safe Cone" },
+  { t: "item", label: "Delete", kbd: "⌫", danger: true },
+];
+
+function CustomContextMenu({ reduced, card }: PreviewProps) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [sub, setSub] = useState<string | null>(null);
+  const [cone, setCone] = useState(false);
+  const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const closeT = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const conePt = useRef<{ x: number; y: number } | null>(null);
+  const auto = useAutoOpen(card, 450);
+
+  useEffect(() => {
+    if (card && auto) {
+      setPos({ x: 28, y: 24 });
+      setOpen(true);
+      const id = setTimeout(() => setSub("Arrange"), 700);
+      return () => clearTimeout(id);
+    }
+  }, [card, auto]);
+
+  const PANEL: React.CSSProperties = {
+    background: "color-mix(in srgb, var(--surface) 90%, transparent)",
+    border: "1px solid var(--border)",
+    borderRadius: 8,
+    padding: 4,
+    backdropFilter: "blur(24px) saturate(1.5)",
+    WebkitBackdropFilter: "blur(24px) saturate(1.5)",
+    boxShadow: "rgba(0,0,0,0.35) 0px 14px 40px",
+  };
+  const spring = reduced ? { duration: 0.001 } : { type: "spring" as const, stiffness: 560, damping: 36 };
+  const row = (extra = "") =>
+    `flex items-center justify-between gap-8 rounded-[4px] px-3 py-1.5 text-[14px] transition-colors ${extra}`;
+
+  const openSub = (label: string) => {
+    if (closeT.current) clearTimeout(closeT.current);
+    setSub(label);
+  };
+  // Safe-cone: when leaving a parent, keep the submenu unless the pointer
+  // clearly moved away (grace timer). Cancelled if pointer reaches the submenu.
+  const scheduleClose = () => {
+    if (closeT.current) clearTimeout(closeT.current);
+    closeT.current = setTimeout(() => setSub(null), 220);
+  };
+
+  return (
+    <div
+      className="relative h-full w-full overflow-hidden"
+      style={{ fontFamily: "Inter, sans-serif" }}
+      onClick={() => setOpen(false)}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        const r = e.currentTarget.getBoundingClientRect();
+        setPos({ x: e.clientX - r.left, y: e.clientY - r.top });
+        setSub(null);
+        setOpen(true);
+      }}
+    >
+      <div className="absolute inset-3 grid place-items-center rounded-[8px] text-[14px]" style={{ border: "1px solid var(--border)", color: "var(--muted)" }}>
+        Right-click anywhere
+      </div>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={spring}
+            style={{ left: pos.x, top: pos.y, transformOrigin: "top left", width: 210, ...PANEL }}
+            className="absolute z-20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {CM_MENU.map((e, i) => {
+              if (e.t === "sep") return <div key={i} style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />;
+              if (e.t === "toggle")
+                return (
+                  <div key={i} className={row("cursor-pointer text-fg hover:bg-surface-2")} onMouseEnter={scheduleClose} onClick={() => setCone((v) => !v)}>
+                    <span className="flex items-center gap-2">
+                      <span style={{ width: 14, color: "#ec4899" }}>{cone ? "✓" : ""}</span>
+                      {e.label}
+                    </span>
+                  </div>
+                );
+              if (e.t === "item")
+                return (
+                  <div
+                    key={i}
+                    className={row(`${e.disabled ? "opacity-40" : "hover:bg-surface-2 cursor-pointer"}`)}
+                    style={{ color: e.danger ? "#ef4444" : "var(--fg)" }}
+                    onMouseEnter={scheduleClose}
+                  >
+                    <span>{e.label}</span>
+                    {e.kbd && <span style={{ color: e.danger ? "#ef4444" : "var(--muted)", fontSize: 12 }}>{e.kbd}</span>}
+                  </div>
+                );
+              // submenu parent
+              const active = sub === e.label;
+              return (
+                <div
+                  key={i}
+                  ref={(el) => { rowRefs.current[e.label] = el; }}
+                  className={row(`cursor-pointer text-fg ${active ? "bg-surface-2" : "hover:bg-surface-2"}`)}
+                  onMouseEnter={(ev) => {
+                    conePt.current = { x: ev.clientX, y: ev.clientY };
+                    openSub(e.label);
+                  }}
+                >
+                  <span>{e.label}</span>
+                  <span style={{ color: "var(--muted)" }}>›</span>
+                  {active && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.96, x: -4 }}
+                      animate={{ opacity: 1, scale: 1, x: 0 }}
+                      transition={spring}
+                      onMouseEnter={() => { if (closeT.current) clearTimeout(closeT.current); }}
+                      onMouseLeave={scheduleClose}
+                      style={{ left: 206, top: (rowRefs.current[e.label]?.offsetTop ?? 0) - 4, transformOrigin: "top left", width: 200, ...PANEL }}
+                      className="absolute z-30"
+                    >
+                      {e.items.map((it, j) =>
+                        "sep" in it ? (
+                          <div key={j} style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
+                        ) : (
+                          <div key={j} className={row("cursor-pointer text-fg hover:bg-surface-2")} style={{ color: "var(--fg)" }}>
+                            <span>{it.label}</span>
+                            {it.kbd && <span style={{ color: "var(--muted)", fontSize: 12 }}>{it.kbd}</span>}
+                          </div>
+                        ),
+                      )}
+                    </motion.div>
+                  )}
+                </div>
+              );
+            })}
+            {/* Safe-cone visualisation */}
+            {cone && sub && conePt.current && (
+              <svg className="pointer-events-none absolute" style={{ left: 0, top: 0, overflow: "visible", width: 1, height: 1 }}>
+                <polygon
+                  points={`${0},${(rowRefs.current[sub]?.offsetTop ?? 0) + 16} 206,${(rowRefs.current[sub]?.offsetTop ?? 0) - 4} 206,${(rowRefs.current[sub]?.offsetTop ?? 0) + 120}`}
+                  fill="rgba(236,72,153,0.14)"
+                  stroke="rgba(236,72,153,0.5)"
+                />
+              </svg>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   FadeInUp,
   StaggerListReveal,
@@ -1397,6 +1588,7 @@ export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   MultiStateBadge,
   TabSelect,
   SmoothTabs,
+  CustomContextMenu,
 };
 
 export function getPreview(name: string) {

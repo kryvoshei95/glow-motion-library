@@ -415,5 +415,44 @@
     "referenceUrl": "https://motion.dev/examples/react-smooth-tabs",
     "standalonePreviewUrl": "https://examples.motion.dev/react/smooth-tabs",
     "matchStatus": "Pixel/motion matched from public live reference"
+  },
+  {
+    "slug": "custom-context-menu",
+    "name": "Context Menu",
+    "tagline": "Кастомне меню з submenu та safe-cone",
+    "category": "dropdown",
+    "interactive": true,
+    "useCase": "Кастомне контекстне меню по ПКМ зі вкладеними submenu (Arrange/Transform) і diagonal safe-zone: submenu не закривається, коли курсор рухається по діагоналі до нього (grace-таймер + трикутник). Пункт «Visualise Safe Cone» малює зону.",
+    "trigger": "click/tap",
+    "duration": { "value": 220, "token": "base", "unit": "ms" },
+    "easing": { "token": "spring", "cubicBezier": [0.22, 1, 0.36, 1] },
+    "motionProperties": [
+      { "property": "opacity/scale (menu)", "from": "0 / 0.96", "to": "1 / 1" },
+      { "property": "opacity/scale/x (submenu)", "from": "0 / 0.96 / -4px", "to": "1 / 1 / 0" }
+    ],
+    "complexity": "advanced",
+    "platform": "web",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — меню та submenu без spring/зсуву; зберігати клавіатурну навігацію (стрілки, Esc), фокус і aria-haspopup для пунктів із submenu."
+    },
+    "devHandoff": {
+      "note": "motion.dev context-menu (reconstructed from public preview): панель blur(24px) saturate(1.5) r8; submenu відкривається праворуч від parent з spring; safe-cone — grace-таймер ~220ms на закриття + трикутник від курсора до країв submenu, щоб діагональний рух не закривав меню.",
+      "css": "/* safe-cone needs JS (pointer tracking). Panel: backdrop-filter: blur(24px) saturate(1.5); border-radius:8px. Submenu positioned right of parent. */",
+      "tailwind": "Панель: backdrop-blur-[24px] rounded-[8px] border p-1; рядок: rounded-[4px] px-3 py-1.5 text-[14px] hover:bg-surface-2",
+      "framerMotion": { "menu": { "initial": { "opacity": 0, "scale": 0.96 }, "animate": { "opacity": 1, "scale": 1 }, "transition": { "type": "spring", "stiffness": 560, "damping": 36 } }, "submenu": { "initial": { "opacity": 0, "scale": 0.96, "x": -4 }, "animate": { "opacity": 1, "scale": 1, "x": 0 } }, "safeCone": "grace timer (~220ms) + pointer-in-triangle check" },
+      "gsap": "gsap.fromTo(menu,{autoAlpha:0,scale:0.96},{autoAlpha:1,scale:1,duration:0.22,ease:'back.out(1.4)'}); submenu hover with safe-triangle JS",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Тримати submenu відкритим, поки курсор рухається в його бік (safe-cone), а не закривати миттєво."],
+      "dont": ["Не закривати submenu одразу при сході курсора з parent — це робить вкладені меню непридатними."]
+    },
+    "tags": ["context", "menu", "submenu", "safe-cone", "spring", "right-click"],
+    "preview": { "component": "CustomContextMenu" },
+    "referenceUrl": "https://motion.dev/examples/react-context-menu",
+    "standalonePreviewUrl": "https://examples.motion.dev/react/context-menu",
+    "matchStatus": "Pixel/motion matched from public live reference"
   }
 ]

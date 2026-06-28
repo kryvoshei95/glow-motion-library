@@ -454,5 +454,62 @@
     "referenceUrl": "https://motion.dev/examples/react-context-menu",
     "standalonePreviewUrl": "https://examples.motion.dev/react/context-menu",
     "matchStatus": "Pixel/motion matched from public live reference"
+  },
+  {
+    "slug": "swipe-actions",
+    "name": "Swipe Actions",
+    "tagline": "Drag-to-reveal приховані дії під карткою",
+    "category": "gesture",
+    "interactive": true,
+    "useCase": "iOS-style swipe: тягнеш картку вліво/вправо — з-під неї виїжджають кольорові дії (Mail/Clock зліва, Archive/Flag справа); відпускаєш — картка пружинить назад. Labels проявляються за дистанцією свайпу.",
+    "trigger": "drag/swipe",
+    "duration": {
+      "value": 0,
+      "token": "spring",
+      "unit": "ms"
+    },
+    "easing": {
+      "token": "spring",
+      "cubicBezier": []
+    },
+    "motionProperties": [
+      { "property": "translateX (card)", "from": "0", "to": "±drag (follow pointer)" },
+      { "property": "opacity (action labels)", "from": 0, "to": 1 },
+      { "property": "scale (action labels)", "from": 0.7, "to": 1 }
+    ],
+    "complexity": "advanced",
+    "platform": "both",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — прибрати авто-демо та spring-повернення (миттєвий snap); забезпечити доступ до дій без жесту (видимі кнопки / клавіатура), бо swipe недоступний для всіх."
+    },
+    "devHandoff": {
+      "note": "motion.dev swipe-actions (reconstructed from public preview): контейнер overflow-hidden; під карткою два absolute action-групи (right:100% / left:100%); foreground <motion.div drag=\"x\" dragSnapToOrigin> зі спільним useMotionValue x; labels через useTransform(x,...) на opacity+scale.",
+      "css": "/* gesture drag + spring snap-back needs JS (Motion). Container: position:relative; overflow:hidden; border-radius:12px. Card: position:absolute; inset:0; z-index:10. Actions behind, pinned to edges (justify-end/justify-start) */",
+      "tailwind": "Контейнер: relative h-20 w-full max-w-[360px] overflow-hidden rounded-[12px] border; картка: absolute inset-0 z-10 flex items-center justify-center bg-surface; дія: absolute inset-0 flex (bg=brand hue), inner h-full w-1/4 flex center, button flex-col gap-1 text-white text-[12px]",
+      "framerMotion": {
+        "card": {
+          "drag": "x",
+          "dragConstraints": { "left": -200, "right": 200 },
+          "dragElastic": 0.6,
+          "dragSnapToOrigin": true,
+          "dragTransition": { "bounceStiffness": 300, "bounceDamping": 30 }
+        },
+        "labelOpacity": "useTransform(x, [100,190], [0,1]) // дзеркально [-100,-190] для правих дій",
+        "labelScale": "useTransform(x, [100,190], [0.7,1])"
+      },
+      "gsap": "Draggable (type:'x', inertia) + onDrag mapping для opacity/scale; на release tween x→0 ease:'elastic.out'",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Пружинити картку назад на release, якщо поріг дії не досягнуто — даєш зрозуміти, що жест скасовано."],
+      "dont": ["Не ховати критичні дії лише за swipe без альтернативного доступу (кнопка/меню)."]
+    },
+    "tags": ["swipe", "drag", "gesture", "actions", "spring", "mobile"],
+    "preview": { "component": "SwipeActions" },
+    "referenceUrl": "https://motion.dev/examples/react-swipe-actions",
+    "standalonePreviewUrl": "https://examples.motion.dev/react/swipe-actions",
+    "matchStatus": "Pixel/motion matched from public live reference"
   }
 ]

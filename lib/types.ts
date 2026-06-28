@@ -4,6 +4,7 @@ export type Category =
   | "buttons"
   | "checkbox"
   | "dropdown"
+  | "gesture"
   | "modal"
   | "progress"
   | "radio"
@@ -79,6 +80,7 @@ export const CATEGORY_ORDER: Category[] = [
   "buttons",
   "checkbox",
   "dropdown",
+  "gesture",
   "modal",
   "progress",
   "radio",
@@ -92,6 +94,7 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   buttons: "Buttons",
   checkbox: "Checkbox",
   dropdown: "Dropdown",
+  gesture: "Gesture & Drag",
   modal: "Modal",
   progress: "Progress Bar",
   radio: "Radio",

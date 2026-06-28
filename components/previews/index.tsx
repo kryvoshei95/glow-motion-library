@@ -1556,6 +1556,113 @@ function CustomContextMenu({ reduced, card }: PreviewProps) {
   );
 }
 
+/* Swipe Actions — motion.dev/examples/react-swipe-actions
+   Reconstructed from the public live preview (examples.motion.dev/react/swipe-actions) via
+   Playwright DOM/computed-style/frame analysis. Original Motion+ source values not available.
+   Measured: container 384×80 relative overflow-hidden radius 12 border 1px var(--border) touch-action:none;
+   foreground card position:absolute inset:0 z-10 bg var(--layer), centred text 14px var(--feint-text)
+   "Swipe left or right to reveal actions"; behind it two action groups —
+   LEFT group (right:100%, revealed by swiping RIGHT): Action 1 (mail-open, #ff0088) over Action 2 (clock9, #dd00ee), justify-end;
+   RIGHT group (left:100%, revealed by swiping LEFT): Action 3 (archive, #9911ff) over Action 4 (flag, #1e75f7), justify-start.
+   Each action: inner zone width 25%, button flex-col gap 4px, icon lucide 24px stroke 1.5, label 12px.
+   Drag measured: x follows pointer with spring lag (dx30→24.6, dx120→113.6), card snaps back to origin on release;
+   labels fade in by drag distance (opacity 0 until ~|100|px, ~0.5 at |143|, ~0.8 at |173|). Brand hues kept exact. */
+const SWIPE_ICONS: Record<string, React.ReactNode> = {
+  mail: (<><path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 .8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z" /><path d="m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10" /></>),
+  clock: (<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 7.5 12" /></>),
+  archive: (<><rect width="20" height="5" x="2" y="3" rx="1" /><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" /><path d="M10 12h4" /></>),
+  flag: (<><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" x2="4" y1="22" y2="15" /></>),
+};
+
+function SwipeAction({
+  bg, icon, label, side, x,
+}: {
+  bg: string; icon: string; label: string; side: "left" | "right";
+  x: ReturnType<typeof useMotionValue<number>>;
+}) {
+  // Reveal the label as the card slides off this edge (positive x → left actions, negative → right).
+  const range: [number, number] = side === "left" ? [100, 190] : [-100, -190];
+  const opacity = useTransform(x, range, [0, 1]);
+  const scale = useTransform(x, range, [0.7, 1]);
+  return (
+    <div
+      className="absolute inset-0 flex"
+      style={{ background: bg, justifyContent: side === "left" ? "flex-end" : "flex-start" }}
+    >
+      <div className="flex h-full w-1/4 items-center justify-center">
+        <motion.span style={{ opacity, scale, transformOrigin: side === "left" ? "left center" : "right center" }}>
+          <button className="flex flex-col items-center justify-center gap-1 text-white" style={{ fontSize: 12 }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              {SWIPE_ICONS[icon]}
+            </svg>
+            {label}
+          </button>
+        </motion.span>
+      </div>
+    </div>
+  );
+}
+
+function SwipeActions({ reduced, card }: PreviewProps) {
+  const x = useMotionValue(0);
+
+  // Card mode: auto-demonstrate both reveals on a loop (no user interaction).
+  useEffect(() => {
+    if (!card || reduced) return;
+    let cancelled = false;
+    const seq = async () => {
+      while (!cancelled) {
+        await animate(x, 150, { type: "spring", stiffness: 200, damping: 26 });
+        await new Promise((r) => setTimeout(r, 600));
+        await animate(x, 0, { type: "spring", stiffness: 300, damping: 30 });
+        await new Promise((r) => setTimeout(r, 400));
+        await animate(x, -150, { type: "spring", stiffness: 200, damping: 26 });
+        await new Promise((r) => setTimeout(r, 600));
+        await animate(x, 0, { type: "spring", stiffness: 300, damping: 30 });
+        await new Promise((r) => setTimeout(r, 700));
+      }
+    };
+    seq();
+    return () => { cancelled = true; };
+  }, [card, reduced, x]);
+
+  return (
+    <div className="flex h-full w-full items-center justify-center p-4" style={{ fontFamily: "Inter, sans-serif" }}>
+      <div
+        className="relative h-20 w-full max-w-[360px] overflow-hidden rounded-[12px] border border-border"
+        style={{ background: "var(--bg)", touchAction: "none" }}
+      >
+        {/* Left actions — revealed by swiping right (Action 1 over Action 2).
+            Pinned off-screen left (right:100%) and translated with the card so each
+            action's right edge tracks the card's left edge as it slides away. */}
+        <motion.div className="absolute flex h-full w-full" style={{ right: "100%", x }}>
+          <SwipeAction bg="#dd00ee" icon="clock" label="Action 2" side="left" x={x} />
+          <SwipeAction bg="#ff0088" icon="mail" label="Action 1" side="left" x={x} />
+        </motion.div>
+        {/* Right actions — revealed by swiping left (Action 3 over Action 4) */}
+        <motion.div className="absolute flex h-full w-full" style={{ left: "100%", x }}>
+          <SwipeAction bg="#1e75f7" icon="flag" label="Action 4" side="right" x={x} />
+          <SwipeAction bg="#9911ff" icon="archive" label="Action 3" side="right" x={x} />
+        </motion.div>
+        {/* Foreground draggable card */}
+        <motion.div
+          className="absolute inset-0 z-10 flex cursor-grab items-center justify-center px-6 active:cursor-grabbing"
+          style={{ x, background: "var(--surface)" }}
+          drag={card ? false : "x"}
+          dragConstraints={{ left: -200, right: 200 }}
+          dragElastic={0.6}
+          dragSnapToOrigin
+          dragTransition={{ bounceStiffness: 300, bounceDamping: 30 }}
+        >
+          <span className="text-center leading-[1.5]" style={{ fontSize: 14, color: "var(--muted)" }}>
+            Swipe left or right to reveal actions
+          </span>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
 export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   FadeInUp,
   StaggerListReveal,
@@ -1589,6 +1696,7 @@ export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   TabSelect,
   SmoothTabs,
   CustomContextMenu,
+  SwipeActions,
 };
 
 export function getPreview(name: string) {

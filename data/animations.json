@@ -375,5 +375,45 @@
     "referenceUrl": "https://motion.dev/examples/react-tab-select",
     "standalonePreviewUrl": "https://examples.motion.dev/react/tab-select",
     "matchStatus": "Pixel/motion matched from public live reference"
+  },
+  {
+    "slug": "smooth-tabs",
+    "name": "Smooth Tabs",
+    "tagline": "Слайдер-індикатор + directional контент",
+    "category": "tab",
+    "interactive": true,
+    "useCase": "Сегментовані таби (Overview/Activity/Settings): білий індикатор їде через layoutId, контент картки змінюється з directional-переходом (зсув у бік напрямку + fade).",
+    "trigger": "click/tap",
+    "duration": { "value": 280, "token": "moderate", "unit": "ms" },
+    "easing": { "token": "ease-smooth", "cubicBezier": [0.22, 1, 0.36, 1] },
+    "motionProperties": [
+      { "property": "layout x/width (indicator)", "from": "tab A", "to": "tab B" },
+      { "property": "translateX (content)", "from": "±40px (за напрямком)", "to": "0" },
+      { "property": "opacity (content)", "from": 0, "to": 1 }
+    ],
+    "complexity": "advanced",
+    "platform": "both",
+    "loop": false,
+    "accessibility": {
+      "reducedMotion": "reduce",
+      "note": "Зменшити рух — без зсуву контенту та spring-індикатора, лишити миттєву зміну; зберігати role=tab, клавіатури та фокус."
+    },
+    "devHandoff": {
+      "note": "motion.dev smooth-tabs (reconstructed from public preview): індикатор <motion.span layoutId>; контент в AnimatePresence з custom={direction} — initial x:+40*dir, exit x:-40*dir; напрямок визначається індексом таба.",
+      "css": "/* directional content + shared indicator needs JS (Motion). Indicator: position:absolute; transition:transform .3s, width .3s. Content: per-tab keyed transition */",
+      "tailwind": "Tab bar: flex gap-1 rounded-[12px] bg-surface-2 p-1; індикатор absolute inset-0 rounded-[8px] bg-surface shadow; контент: rounded-[14px] border bg-surface p-5",
+      "framerMotion": { "indicator": "<motion.span layoutId=\"smooth-tab-indicator\"/>", "indicatorTransition": { "type": "spring", "stiffness": 500, "damping": 38 }, "content": { "custom": "dir", "initial": { "x": "40*dir", "opacity": 0 }, "animate": { "x": 0, "opacity": 1 }, "exit": { "x": "-40*dir", "opacity": 0 }, "transition": { "duration": 0.28, "ease": [0.22, 1, 0.36, 1] } } },
+      "gsap": "gsap.fromTo(content,{x:40*dir,autoAlpha:0},{x:0,autoAlpha:1,duration:0.28,ease:'power2.out'}); Flip for indicator",
+      "lottie": null
+    },
+    "guidelines": {
+      "do": ["Узгоджувати напрямок зсуву контенту з напрямком переходу між табами."],
+      "dont": ["Не робити простий fade без напрямку — це ламає відчуття переходу."]
+    },
+    "tags": ["tab", "segmented", "directional", "layout", "indicator", "content"],
+    "preview": { "component": "SmoothTabs" },
+    "referenceUrl": "https://motion.dev/examples/react-smooth-tabs",
+    "standalonePreviewUrl": "https://examples.motion.dev/react/smooth-tabs",
+    "matchStatus": "Pixel/motion matched from public live reference"
   }
 ]

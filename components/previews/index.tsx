@@ -1259,6 +1259,112 @@ function TabSelect({ reduced, card }: PreviewProps) {
   );
 }
 
+/* Smooth Tabs — sliding indicator + directional content (motion.dev/examples/react-smooth-tabs)
+   Reconstructed from the public live preview (examples.motion.dev/react/smooth-tabs) via
+   Playwright DOM/screenshot measurement. Original Motion+ source values not available.
+   Measured content: Overview/Activity/Settings, per-tab gradient icon, description + 3 stats;
+   white sliding pill indicator (layoutId); content slides directionally on switch.
+   Surfaces theme-aware; gradient icon colours kept as the reference identity. */
+const SMOOTH_TABS = [
+  {
+    key: "Overview",
+    grad: ["#a78bfa", "#7c3aed"],
+    icon: <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" />,
+    desc: "Track your project progress across all active workstreams and milestones.",
+    stats: [["12", "ACTIVE"], ["84", "COMPLETE"], ["94%", "VELOCITY"]],
+  },
+  {
+    key: "Activity",
+    grad: ["#f472b6", "#db2777"],
+    icon: <path d="M3 12h4l2 6 4-14 2 8h6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />,
+    desc: "Recent changes, commits, and team updates from the last 7 days.",
+    stats: [["47", "COMMITS"], ["23", "REVIEWS"], ["18", "MERGED"]],
+  },
+  {
+    key: "Settings",
+    grad: ["#67e8f9", "#0891b2"],
+    icon: <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M12 3v2M12 19v2M5 5l1.5 1.5M17.5 17.5L19 19M3 12h2M19 12h2M5 19l1.5-1.5M17.5 6.5L19 5" /></g>,
+    desc: "Configure notifications, access controls, and integration preferences.",
+    stats: [["8", "MEMBERS"], ["3", "ROLES"], ["5", "HOOKS"]],
+  },
+] as const;
+
+function SmoothTabs({ reduced, card }: PreviewProps) {
+  const [[idx, dir], setTab] = useState<[number, number]>([0, 0]);
+  const select = (i: number) => setTab([i, i > idx ? 1 : -1]);
+  useEffect(() => {
+    if (!card) return;
+    const id = setInterval(() => setTab(([i]) => [(i + 1) % SMOOTH_TABS.length, 1]), 1500);
+    return () => clearInterval(id);
+  }, [card]);
+  const tab = SMOOTH_TABS[idx];
+  const dist = reduced ? 0 : 40;
+  // Reconstructed springs (indicator travel + content slide matched to live preview).
+  const indSpring = reduced ? { duration: 0.001 } : { type: "spring" as const, stiffness: 500, damping: 38 };
+  const contentT = reduced ? { duration: 0.001 } : { duration: 0.28, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] };
+
+  return (
+    <div className="flex h-full w-full items-center justify-center p-4" style={{ fontFamily: "Inter, sans-serif" }}>
+      <div className="flex w-full max-w-[400px] flex-col gap-3">
+        {/* Tab bar */}
+        <div className="flex gap-1 rounded-[12px] border border-border bg-surface-2 p-1">
+          {SMOOTH_TABS.map((t, i) => (
+            <button
+              key={t.key}
+              onClick={() => select(i)}
+              className="relative flex-1 rounded-[8px] px-3 py-2 text-[15px]"
+              style={{ color: idx === i ? "var(--fg)" : "var(--muted)" }}
+            >
+              {idx === i && (
+                <motion.span
+                  layoutId="smooth-tab-indicator"
+                  transition={indSpring}
+                  className="absolute inset-0"
+                  style={{ background: "var(--surface)", borderRadius: 8, boxShadow: "rgba(0,0,0,0.12) 0px 2px 6px", zIndex: 0 }}
+                />
+              )}
+              <span className="relative z-[1] font-medium">{t.key}</span>
+            </button>
+          ))}
+        </div>
+        {/* Content card */}
+        <div className="relative overflow-hidden rounded-[14px] border border-border bg-surface p-5" style={{ minHeight: 196 }}>
+          <AnimatePresence mode="popLayout" custom={dir} initial={false}>
+            <motion.div
+              key={tab.key}
+              custom={dir}
+              initial={{ x: dist * dir, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -dist * dir, opacity: 0 }}
+              transition={contentT}
+              className="flex flex-col gap-3"
+            >
+              <div className="flex items-center gap-3">
+                <span
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] text-white"
+                  style={{ background: `linear-gradient(135deg, ${tab.grad[0]}, ${tab.grad[1]})` }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">{tab.icon}</svg>
+                </span>
+                <h4 className="text-[16px] font-semibold" style={{ color: "var(--fg)" }}>{tab.key}</h4>
+              </div>
+              <p className="text-[13px] leading-snug" style={{ color: "var(--muted)" }}>{tab.desc}</p>
+              <div className="grid grid-cols-3 gap-px overflow-hidden rounded-[10px] border border-border bg-border">
+                {tab.stats.map(([num, label]) => (
+                  <div key={label} className="flex flex-col items-center gap-0.5 bg-surface py-3">
+                    <span className="text-[20px] font-semibold" style={{ color: "var(--fg)" }}>{num}</span>
+                    <span className="text-[10px] tracking-wider" style={{ color: "var(--muted)" }}>{label}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   FadeInUp,
   StaggerListReveal,
@@ -1290,6 +1396,7 @@ export const PREVIEWS: Record<string, React.ComponentType<PreviewProps>> = {
   ContextMenu,
   MultiStateBadge,
   TabSelect,
+  SmoothTabs,
 };
 
 export function getPreview(name: string) {
